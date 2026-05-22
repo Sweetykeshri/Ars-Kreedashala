@@ -15,12 +15,40 @@ import CoachAttendance from './pages/attendance/CoachAttendance';
 import LeaveManagement from './pages/attendance/LeaveManagement';
 import AttendanceReports from './pages/attendance/AttendanceReports';
 
+// Training & Batch Operations
+import BatchCreation from './pages/training/BatchCreation';
+import TrainingSchedule from './pages/training/TrainingSchedule';
+import CoachAssignment from './pages/training/CoachAssignment';
+import GroundAllocation from './pages/training/GroundAllocation';
+
+// Coach Management
+import CoachProfiles from './pages/coach/CoachProfiles';
+import CoachAttendancePage from './pages/coach/CoachAttendance';
+import AssignedBatches from './pages/coach/AssignedBatches';
+
+// Reports & Analytics
+import AdmissionReports from './pages/reports/AdmissionReports';
+import FeeAnalytics from './pages/reports/FeeReports';
+import AttendanceAnalytics from './pages/reports/AttendanceAnalytics';
+import PerformanceReports from './pages/reports/PerformanceReports';
+
 // Fee Management
 import AdmissionFee from './pages/fees/AdmissionFee';
 import MonthlyCollection from './pages/fees/MonthlyCollection';
 import PendingFees from './pages/fees/PendingFees';
 import PaymentReceipts from './pages/fees/PaymentReceipts';
 import FeeReports from './pages/fees/FeeReports';
+
+// Settings
+import UserRoles from './pages/settings/UserRoles';
+import Permissions from './pages/settings/Permissions';
+import AcademySettings from './pages/settings/AcademySettings';
+import SystemConfig from './pages/settings/SystemConfig';
+
+// Admin Management
+import AdminUsers from './pages/admin/AdminUsers';
+import ActivityLogs from './pages/admin/ActivityLogs';
+import AccessControl from './pages/admin/AccessControl';
 
 function App() {
   return (
@@ -34,6 +62,23 @@ function App() {
             <Route path="trial" element={<TrialRegistrations />} />
             <Route path="approval" element={<AdmissionApproval />} />
             <Route path="documents" element={<DocumentVerification />} />
+          </Route>
+          <Route path="training">
+            <Route path="batch-creation" element={<BatchCreation />} />
+            <Route path="schedule" element={<TrainingSchedule />} />
+            <Route path="coach-assignment" element={<CoachAssignment />} />
+            <Route path="ground-allocation" element={<GroundAllocation />} />
+          </Route>
+          <Route path="coach">
+            <Route path="profiles" element={<CoachProfiles />} />
+            <Route path="attendance" element={<CoachAttendancePage />} />
+            <Route path="assigned-batches" element={<AssignedBatches />} />
+          </Route>
+          <Route path="reports">
+            <Route path="admissions" element={<AdmissionReports />} />
+            <Route path="fees" element={<FeeAnalytics />} />
+            <Route path="attendance" element={<AttendanceAnalytics />} />
+            <Route path="performance" element={<PerformanceReports />} />
           </Route>
           <Route path="students">
             <Route path="profiles" element={<StudentProfiles />} />
@@ -53,6 +98,17 @@ function App() {
             <Route path="pending" element={<PendingFees />} />
             <Route path="receipts" element={<PaymentReceipts />} />
             <Route path="reports" element={<FeeReports />} />
+          </Route>
+          <Route path="settings">
+            <Route path="roles" element={<UserRoles />} />
+            <Route path="permissions" element={<Permissions />} />
+            <Route path="academy" element={<AcademySettings />} />
+            <Route path="system" element={<SystemConfig />} />
+          </Route>
+          <Route path="admin">
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="activity-logs" element={<ActivityLogs />} />
+            <Route path="access-control" element={<AccessControl />} />
           </Route>
         </Route>
       </Routes>
