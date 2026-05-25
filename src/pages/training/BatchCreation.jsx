@@ -43,7 +43,7 @@ const BatchCreation = () => {
           <p className="text-gray-500 text-sm mt-1">Organize and monitor training units across the academy.</p>
         </div>
         <button 
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => alert(`Launching Deployment Wizard for New Training Batch...`)}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-200"
         >
           <Plus size={20} />
@@ -167,10 +167,22 @@ const BatchCreation = () => {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                      <button 
+                        onClick={() => alert(`Configuring modifications for batch: ${batch.id}`)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" 
+                        title="Edit"
+                      >
                         <Edit2 size={16} />
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Delete">
+                      <button 
+                        onClick={() => {
+                          if(confirm(`Security Alert: Are you sure you want to decommission batch ${batch.id}?`)) {
+                            alert(`Batch ${batch.id} has been decommissioned.`);
+                          }
+                        }}
+                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" 
+                        title="Delete"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -241,7 +253,13 @@ const BatchCreation = () => {
               >
                 Abort Protocol
               </button>
-              <button className="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all outline-none">
+              <button 
+                onClick={() => {
+                  alert('Unit deployment sequence initiated! New training batch is now live.');
+                  setIsFormOpen(false);
+                }}
+                className="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all outline-none"
+              >
                 Deploy Unit
               </button>
             </div>

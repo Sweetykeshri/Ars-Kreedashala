@@ -8,6 +8,7 @@ import {
   ArrowDownRight,
   Filter,
   FileText,
+  FileDown,
   Clock,
   Calendar
 } from 'lucide-react';
@@ -55,6 +56,22 @@ const FeeReports = () => {
         title={<>Treasury: <span className="text-blue-600">Financial Reports</span></>}
         subtitle="Revenue surveillance and fee collection audit"
         icon={CircleDollarSign}
+        actions={
+          <div className="flex items-center gap-3">
+             <button 
+               onClick={() => alert('Launching cryptographic revenue filters...')}
+               className="p-3 bg-white border border-gray-100 text-gray-400 rounded-xl hover:text-blue-600 transition-all shadow-sm"
+             >
+               <Filter size={18} />
+             </button>
+             <button 
+               onClick={() => alert('Genrating consolidated fiscal audit report... Downloading encrypted PDF.')}
+               className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all"
+             >
+               <FileDown size={16} /> Export Intel
+             </button>
+          </div>
+        }
       />
 
       {/* KPI Grid */}
@@ -96,15 +113,15 @@ const FeeReports = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm transition-all hover:shadow-md">
+        <div className="lg:col-span-2 bg-white p-8 rounded-4xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">Revenue Trajectory</h3>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Collection vs Projected Target</p>
             </div>
           </div>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-75 w-full">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={collectionData} barGap={8}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis 

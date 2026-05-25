@@ -32,7 +32,10 @@ const AcademySettings = () => {
               <div className="w-32 h-32 rounded-[2.5rem] bg-gray-50 border-2 border-gray-100 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-600">
                 <Trophy size={48} className="text-gray-200 group-hover:text-blue-600 transition-colors" />
               </div>
-              <button className="absolute bottom-0 right-0 p-3 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all">
+              <button 
+                onClick={() => alert('Accessing secure optics for academy insignia update...')}
+                className="absolute bottom-0 right-0 p-3 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all"
+              >
                 <Camera size={18} />
               </button>
             </div>
@@ -68,7 +71,12 @@ const AcademySettings = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8">
-              <button className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all">
+              <button 
+                onClick={() => {
+                   alert('Identity synchronization successful. Public academy profile updated across all modules.');
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all"
+              >
                 <Save size={16} /> Update Protocol
               </button>
             </div>

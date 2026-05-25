@@ -54,7 +54,10 @@ const MonthlyCollection = () => {
               <option>June 2024</option>
             </select>
           </div>
-          <button className="px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2">
+          <button 
+            onClick={() => alert('Initiating bulk fee collection process for selected batch...')}
+            className="px-4 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2"
+          >
             <Users size={18} />
             <span>Bulk Collect</span>
           </button>
@@ -93,7 +96,10 @@ const MonthlyCollection = () => {
             />
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-gray-100">
+            <button 
+              onClick={() => alert('Filtering revenue data by custom parameters...')}
+              className="p-2.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all border border-gray-100"
+            >
               <Filter size={20} />
             </button>
             <div className="h-6 w-px bg-gray-200 mx-1"></div>

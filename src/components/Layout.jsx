@@ -10,24 +10,28 @@ const Layout = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#fcfdfe] flex overflow-x-hidden">
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar={closeSidebar} />
       
       {/* Mobile Sidebar Overlay */}
       <div 
         className={`fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40 md:hidden transition-all duration-300 ease-in-out ${
           isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`} 
-        onClick={toggleSidebar}
+        onClick={closeSidebar}
       ></div>
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:pl-0' : ''}`}>
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out md:ml-64">
         <Navbar toggleSidebar={toggleSidebar} />
         
-        <main className="flex-1 p-3 sm:p-5 md:p-8 mt-20 w-full overflow-x-hidden">
-          <div className="max-w-[1600px] mx-auto animate-fadeIn pb-10">
+        <main className="flex-1 p-3 sm:p-5 md:pt-4 md:pb-8 md:px-8 w-full overflow-x-hidden">
+          <div className="max-w-400 mx-auto animate-fadeIn pb-10">
             <Outlet />
           </div>
         </main>

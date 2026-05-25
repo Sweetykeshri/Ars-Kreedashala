@@ -100,7 +100,10 @@ const SystemConfig = () => {
               <div className="flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-lg text-[9px] font-black uppercase">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Up to date
               </div>
-              <button className="text-[9px] font-black uppercase text-blue-400 hover:text-blue-300 flex items-center gap-1">
+              <button 
+                onClick={() => alert('Scanning for OS patches... Everything is nominal.')}
+                className="text-[9px] font-black uppercase text-blue-400 hover:text-blue-300 flex items-center gap-1"
+              >
                 Check for updates <RefreshCw size={12} />
               </button>
             </div>
@@ -141,7 +144,10 @@ const SystemConfig = () => {
                 <Toggle enabled={config.cloudSync} onChange={() => toggleSetting('cloudSync')} />
               </div>
 
-              <div className="flex items-center justify-between p-6 border-2 border-dashed border-gray-100 rounded-[2rem] group hover:border-blue-100 transition-colors cursor-pointer">
+              <div 
+                onClick={() => alert('Encrypting system snapshot for secure download...')}
+                className="flex items-center justify-between p-6 border-2 border-dashed border-gray-100 rounded-[2rem] group hover:border-blue-100 transition-colors cursor-pointer"
+              >
                 <div className="flex items-center gap-4 p-2">
                   <div className="p-3 bg-gray-50 text-gray-400 rounded-2xl group-hover:text-blue-600 group-hover:bg-blue-50 transition-all">
                     <HardDrive size={20} />
@@ -158,7 +164,14 @@ const SystemConfig = () => {
             </div>
           </div>
 
-          <div className="bg-rose-600 p-10 rounded-[3rem] text-white shadow-xl shadow-rose-100 relative group cursor-pointer hover:bg-rose-700 transition-all">
+          <div 
+            onClick={() => {
+              if(confirm('CRITICAL SYSTEM ALERT: You are about to initiate a FULL SYSTEM WIPE. This will erase all data, configurations, and logs. This cannot be undone. DO YOU HAVE PHYSICAL AUTHORIZATION?')) {
+                alert('Handshake required: Please insert Physical Auth-Key and provide biometric verification.');
+              }
+            }}
+            className="bg-rose-600 p-10 rounded-[3rem] text-white shadow-xl shadow-rose-100 relative group cursor-pointer hover:bg-rose-700 transition-all"
+          >
              <div className="flex justify-between items-start mb-6">
                <div className="p-3 bg-white/20 rounded-2xl">
                  <RefreshCw size={24} className="group-hover:rotate-180 transition-transform duration-700" />

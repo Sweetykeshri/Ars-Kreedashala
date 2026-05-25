@@ -8,7 +8,8 @@ import {
   UserCheck, 
   UserCog,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  ArrowRight
 } from 'lucide-react';
 import { SettingsHeader } from '../../components/settings/SettingsShared';
 
@@ -90,7 +91,10 @@ const UserRoles = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all w-full md:w-auto justify-center">
+        <button 
+          onClick={() => alert('Initiating protocol to establish new administrative command role...')}
+          className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all w-full md:w-auto justify-center"
+        >
           <Plus size={16} /> Establish New Role
         </button>
       </div>
@@ -114,7 +118,10 @@ const UserRoles = () => {
                   </div>
                 </div>
               </div>
-              <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all">
+              <button 
+                onClick={() => alert(`Configuring advanced override options for ${role.name}...`)}
+                className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all"
+              >
                 <MoreHorizontal size={20} />
               </button>
             </div>
@@ -148,7 +155,10 @@ const UserRoles = () => {
                   </div>
                 ))}
               </div>
-              <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:gap-2 transition-all flex items-center gap-1">
+              <button 
+                onClick={() => alert(`Redirecting to Security Matrix for ${role.name} configuration...`)}
+                className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:gap-2 transition-all flex items-center gap-1"
+              >
                 Modify Access <Shield size={14} />
               </button>
             </div>

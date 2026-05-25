@@ -95,10 +95,16 @@ const CoachProfiles = () => {
           <p className="text-gray-500 font-bold uppercase text-xs tracking-widest mt-1">Management of Elite Training Staff & Credentials</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl font-black uppercase text-xs hover:bg-gray-50 transition-all">
+          <button 
+            onClick={() => alert('Generating staff credentials report and exporting metadata...')}
+            className="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl font-black uppercase text-xs hover:bg-gray-50 transition-all"
+          >
             <Download size={16} /> Export Docs
           </button>
-          <button className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-xl font-black uppercase text-xs hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">
+          <button 
+            onClick={() => alert('Launching Recruitment Protocol for New Elite Training Staff...')}
+            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-xl font-black uppercase text-xs hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+          >
             <Plus size={16} /> Recruit Coach
           </button>
         </div>
@@ -207,7 +213,10 @@ const CoachProfiles = () => {
                 </div>
                 <span className="pl-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Units Assigned</span>
               </div>
-              <button className="flex items-center gap-1 text-xs font-black text-blue-600 uppercase tracking-widest hover:gap-2 transition-all">
+              <button 
+                onClick={() => alert(`Accessing full dossier and performance logs for ${coach.name}`)}
+                className="flex items-center gap-1 text-xs font-black text-blue-600 uppercase tracking-widest hover:gap-2 transition-all"
+              >
                 Full File <ChevronRight size={16} />
               </button>
             </div>

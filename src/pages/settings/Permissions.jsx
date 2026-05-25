@@ -77,7 +77,14 @@ const Permissions = () => {
                   <h3 className="text-sm font-black text-gray-900 uppercase">Operational Scopes</h3>
                   <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Configuring {selectedRole.replace('-', ' ')} clearance</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-black uppercase text-[10px] hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all">
+                <button 
+                  onClick={() => {
+                    if(confirm(`Protocol Authorization: Deploy updated security matrix for ${selectedRole}? This will override all active session clearances.`)) {
+                      alert('Security matrix deployed. Changes synchronized across all distributed nodes.');
+                    }
+                  }}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-black uppercase text-[10px] hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all"
+                >
                   <Save size={16} /> Deploy Changes
                 </button>
              </div>

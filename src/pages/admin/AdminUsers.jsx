@@ -115,10 +115,16 @@ const AdminUsers = () => {
             />
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 border border-gray-100 rounded-xl font-black uppercase text-[10px] hover:bg-gray-50 transition-all shadow-sm">
+            <button 
+              onClick={() => alert('Opening advanced security staff filters...')}
+              className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 border border-gray-100 rounded-xl font-black uppercase text-[10px] hover:bg-gray-50 transition-all shadow-sm"
+            >
               <Filter size={16} /> Filters
             </button>
-            <button className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all">
+            <button 
+              onClick={() => alert('Initiating Recruitment Protocol for New Administrator...') }
+              className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all"
+            >
               <Plus size={16} /> Induct Admin
             </button>
           </div>
@@ -178,13 +184,26 @@ const AdminUsers = () => {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                      <button 
+                        onClick={() => alert(`Reviewing activity and security logs for ${user.name}`)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                      >
                         <Eye size={18} />
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
+                      <button 
+                        onClick={() => alert(`Modifying access credentials for ${user.id}`)}
+                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                      >
                         <Edit2 size={18} />
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                      <button 
+                        onClick={() => {
+                          if(confirm(`Security Alert: Are you sure you want to REVOKE access for ${user.name}? This cannot be undone.`)) {
+                            alert(`Access for ${user.id} has been revoked.`);
+                          }
+                        }}
+                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                      >
                         <Trash2 size={18} />
                       </button>
                     </div>

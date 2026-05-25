@@ -12,7 +12,12 @@ const TrialRegistrations = () => {
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800">Trial Registrations</h3>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Export CSV</button>
+        <button 
+          onClick={() => alert('Exporting all trial registration logs as CSV...')}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+        >
+          Export CSV
+        </button>
       </div>
 
       <div className="overflow-x-auto">
@@ -44,7 +49,12 @@ const TrialRegistrations = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium">Manage</button>
+                  <button 
+                    onClick={() => alert(`Opening management panel for trial: ${trial.id} (${trial.name})`)}
+                    className="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Manage
+                  </button>
                 </td>
               </tr>
             ))}

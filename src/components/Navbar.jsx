@@ -71,7 +71,10 @@ const Navbar = ({ toggleSidebar }) => {
         </div>
         
         <div className="flex items-center gap-1 sm:gap-2">
-          <button className="p-2.5 text-gray-500 hover:bg-gray-50 rounded-xl relative transition-all group">
+          <button 
+            onClick={() => alert('New notifications: Admissions pending approval, New trial registrations.')}
+            className="p-2.5 text-gray-500 hover:bg-gray-50 rounded-xl relative transition-all group"
+          >
             <Bell size={20} />
             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white"></span>
           </button>
@@ -110,14 +113,28 @@ const Navbar = ({ toggleSidebar }) => {
                   <p className="text-xs text-gray-500 truncate">admin@arskreeda.com</p>
                 </div>
                 <div className="p-1">
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => { setShowProfileMenu(false); alert('Redirecting to Profile Settings...'); }}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
                     <UserCircle size={18} /> Profile Settings
                   </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => { setShowProfileMenu(false); alert('Opening System Configuration...'); }}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
                     <Settings size={18} /> System Config
                   </button>
                   <div className="my-1 border-t border-gray-50"></div>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <button 
+                    onClick={() => { 
+                      setShowProfileMenu(false); 
+                      if(confirm('Are you sure you want to sign out?')) {
+                        alert('Signing out of Ars Management System...');
+                      }
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
                     <LogOut size={18} /> Sign Out
                   </button>
                 </div>

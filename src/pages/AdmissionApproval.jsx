@@ -22,13 +22,30 @@ const AdmissionApproval = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+              <button 
+                onClick={() => alert(`Showing details for Application #${1000 + i}`)}
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              >
                 <Eye size={16} /> View Details
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors">
+              <button 
+                onClick={() => {
+                  if(confirm(`Are you sure you want to REJECT Application #${1000 + i}?`)) {
+                    alert(`Application #${1000 + i} rejected.`);
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
+              >
                 <XCircle size={16} /> Reject
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+              <button 
+                onClick={() => {
+                  if(confirm(`Approve Application #${1000 + i} for immediate enrollment?`)) {
+                    alert(`Application #${1000 + i} has been approved.`);
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+              >
                 <CheckCircle2 size={16} /> Approve
               </button>
             </div>

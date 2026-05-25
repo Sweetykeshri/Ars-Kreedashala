@@ -56,6 +56,22 @@ const AttendanceAnalytics = () => {
         title={<>Deployment: <span className="text-blue-600">Attendance Tracker</span></>}
         subtitle="Operational efficiency and personnel presence metrics"
         icon={Clock}
+        actions={
+          <div className="flex items-center gap-3">
+             <button 
+               onClick={() => alert('Opening advanced reconnaissance filters for attendance...')}
+               className="p-3 bg-white border border-gray-100 text-gray-400 rounded-xl hover:text-blue-600 transition-all shadow-sm"
+             >
+               <Filter size={18} />
+             </button>
+             <button 
+               onClick={() => alert('Downloading encrypted intelligence dossier (Attendance PDF)...')}
+               className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all"
+             >
+               <FileDown size={16} /> Export Intel
+             </button>
+          </div>
+        }
       />
 
       {/* KPI Section */}
@@ -105,7 +121,7 @@ const AttendanceAnalytics = () => {
             </div>
           </div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <LineChart data={weeklyAttendance}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis 

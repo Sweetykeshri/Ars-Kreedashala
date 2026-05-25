@@ -29,7 +29,7 @@ import {
   History
 } from 'lucide-react';
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState({
     admission: false,
@@ -71,7 +71,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const handleLinkClick = () => {
     // Close sidebar on mobile when a link is clicked
     if (window.innerWidth < 768) {
-      toggleSidebar();
+      closeSidebar();
     }
   };
 
@@ -99,7 +99,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { title: 'New Admission', path: '/admission/new', icon: <UserPlus size={18} /> },
         { title: 'Trial Registrations', path: '/admission/trial', icon: <Users size={18} /> },
         { title: 'Admission Approval', path: '/admission/approval', icon: <CheckSquare size={18} /> },
-        { title: 'Document Verification', path: '/admission/documents', icon: <FileText size={18} /> },
+        { title: 'Total Admission', path: '/admission/list', icon: <Users size={18} /> },
       ]
     },
     {
@@ -118,8 +118,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: <Users size={20} />,
       id: 'coach',
       submenu: [
+        { title: 'Total Coach', path: '/coach/total', icon: <Users size={18} /> },
         { title: 'Coach Profiles', path: '/coach/profiles', icon: <UserCircle size={18} /> },
-        { title: 'Coach Attendance', path: '/coach/attendance', icon: <Clock size={18} /> },
         { title: 'Assigned Batches', path: '/coach/assigned-batches', icon: <LayoutGrid size={18} /> },
       ]
     },
@@ -193,7 +193,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   return (
-    <aside className={`fixed md:relative top-0 left-0 z-50 h-screen transition-all duration-300 ease-in-out ${isOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:w-64 md:translate-x-0'} bg-white border-r border-gray-100 shadow-sm overflow-hidden flex flex-col shrink-0`}>
+    <aside className={`fixed top-0 left-0 z-50 h-screen w-64 bg-white border-r border-gray-100 shadow-sm flex flex-col shrink-0 transition-transform duration-300 ease-in-out overflow-hidden ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
       <div className="p-6 flex items-center justify-between border-b border-gray-50 h-20 shrink-0">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-blue-600 rounded-lg">
@@ -224,7 +224,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   </div>
                 </button>
                 
-                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openMenus[item.id] ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openMenus[item.id] ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <div className="pl-4 mt-1 space-y-1 mb-2">
                     {item.submenu.map((sub) => (
                       <NavLink

@@ -17,10 +17,16 @@ const StudentProfiles = () => {
           <p className="text-gray-500 text-sm">Manage athlete records and personal information.</p>
         </div>
         <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => alert('Preparing student profiles for export...')}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-100 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          >
             <Download size={18} /> Export
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-sm">
+          <button 
+            onClick={() => alert('Launching Add New Student module...')}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-sm"
+          >
             <Plus size={18} /> Add Student
           </button>
         </div>
@@ -37,10 +43,16 @@ const StudentProfiles = () => {
             />
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg text-sm hover:bg-gray-100">
+            <button 
+              onClick={() => alert('Opening advanced data filters...')}
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-600 rounded-lg text-sm hover:bg-gray-100"
+            >
               <Filter size={16} /> Filter
             </button>
-            <select className="bg-gray-50 text-gray-600 px-3 py-2 rounded-lg text-sm outline-none">
+            <select 
+              onChange={(e) => alert(`Displaying records for sport: ${e.target.value}`)}
+              className="bg-gray-50 text-gray-600 px-3 py-2 rounded-lg text-sm outline-none cursor-pointer"
+            >
               <option>All Sports</option>
               <option>Cricket</option>
               <option>Football</option>

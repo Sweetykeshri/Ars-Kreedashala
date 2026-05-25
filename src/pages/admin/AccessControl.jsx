@@ -17,14 +17,19 @@ import { AdminHeader, AdminStatCard, AdminToggle } from '../../components/admin/
 
 const AccessControl = () => {
   const [selectedRole, setSelectedRole] = useState('OPERATIONS');
-  
-  const permissions = [
+  const [permissionState, setPermissionState] = useState([
     { id: 'ADM', name: 'Admissions Panel', view: true, create: true, edit: true, delete: false, approve: true },
     { id: 'TRA', name: 'Training Operations', view: true, create: true, edit: true, delete: true, approve: true },
     { id: 'FEE', name: 'Treasury & Finance', view: true, create: false, edit: false, delete: false, approve: false },
     { id: 'ATT', name: 'Presence Hub', view: true, create: true, edit: true, delete: false, approve: false },
     { id: 'STA', name: 'Staffing HQ', view: true, create: false, edit: false, delete: false, approve: false },
-  ];
+  ]);
+
+  const togglePermission = (id, field) => {
+    setPermissionState(prev => prev.map(p => 
+      p.id === id ? { ...p, [field]: !p[field] } : p
+    ));
+  };
 
   return (
     <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -108,7 +113,14 @@ const AccessControl = () => {
                     <h3 className="text-sm font-black text-gray-900 uppercase">Module Clearance Matrix</h3>
                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1 italic">Configuring clearance for {selectedRole} Tier</p>
                   </div>
-                  <button className="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-xl shadow-gray-200 transition-all">
+                  <button 
+                    onClick={() => {
+                      if(confirm(`System Authorization: Confirm deployment of new security protocols for ${selectedRole} Tier? This will take immediate effect.`)) {
+                        alert(`Security Matrix for ${selectedRole} has been updated and synchronized.`);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-xl shadow-gray-200 transition-all"
+                  >
                     <Save size={16} /> Deploy Protocols
                   </button>
                </div>
@@ -126,25 +138,25 @@ const AccessControl = () => {
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-gray-50">
-                     {permissions.map((module) => (
+                     {permissionState.map((module) => (
                        <tr key={module.id} className="hover:bg-gray-50/50 transition-colors">
                          <td className="px-10 py-6">
                            <span className="text-[10px] font-black text-gray-900 uppercase tracking-wider">{module.name}</span>
                          </td>
                          <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.view} onChange={() => {}} /></div>
+                           <div className="flex justify-center"><AdminToggle enabled={module.view} onChange={() => togglePermission(module.id, 'view')} /></div>
                          </td>
                          <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.create} onChange={() => {}} /></div>
+                           <div className="flex justify-center"><AdminToggle enabled={module.create} onChange={() => togglePermission(module.id, 'create')} /></div>
                          </td>
                          <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.edit} onChange={() => {}} /></div>
+                           <div className="flex justify-center"><AdminToggle enabled={module.edit} onChange={() => togglePermission(module.id, 'edit')} /></div>
                          </td>
                          <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.delete} onChange={() => {}} /></div>
+                           <div className="flex justify-center"><AdminToggle enabled={module.delete} onChange={() => togglePermission(module.id, 'delete')} /></div>
                          </td>
                          <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.approve} onChange={() => {}} /></div>
+                           <div className="flex justify-center"><AdminToggle enabled={module.approve} onChange={() => togglePermission(module.id, 'approve')} /></div>
                          </td>
                        </tr>
                      ))}

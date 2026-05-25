@@ -56,6 +56,22 @@ const AdmissionReports = () => {
         title={<>Intelligence: <span className="text-blue-600">Admission Metrics</span></>}
         subtitle="End-to-end recruitment funnel and intake analytics"
         icon={UserPlus}
+        actions={
+          <div className="flex items-center gap-3">
+             <button 
+               onClick={() => alert('Launching intake trajectory filters...')}
+               className="p-3 bg-white border border-gray-100 text-gray-400 rounded-xl hover:text-blue-600 transition-all shadow-sm"
+             >
+               <Filter size={18} />
+             </button>
+             <button 
+               onClick={() => alert('Extracting end-to-end conversion report (Admission PDF)...')}
+               className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all"
+             >
+               <FileDown size={16} /> Export Intel
+             </button>
+          </div>
+        }
       />
 
       {/* KPI Section */}
@@ -110,7 +126,7 @@ const AdmissionReports = () => {
             </select>
           </div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorNew" x1="0" y1="0" x2="0" y2="1">
@@ -154,7 +170,7 @@ const AdmissionReports = () => {
         <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm transition-all hover:shadow-md">
           <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight mb-8">Lead Generation</h3>
           <div className="h-[250px] w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={sourceData}

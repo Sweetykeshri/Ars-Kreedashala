@@ -59,6 +59,22 @@ const PerformanceReports = () => {
         title={<>Command: <span className="text-blue-600">Performance Intelligence</span></>}
         subtitle="End-to-end athlete proficiency and growth surveillance"
         icon={Trophy}
+        actions={
+          <div className="flex items-center gap-3">
+             <button 
+               onClick={() => alert('Launching performance vector filters...')}
+               className="p-3 bg-white border border-gray-100 text-gray-400 rounded-xl hover:text-blue-600 transition-all shadow-sm"
+             >
+               <Filter size={18} />
+             </button>
+             <button 
+               onClick={() => alert('Compiling tactical proficiency dossier... Downloading encrypted PDF.')}
+               className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-lg shadow-gray-200 transition-all"
+             >
+               <TrendingUp size={16} /> Export Intel
+             </button>
+          </div>
+        }
       />
 
       {/* KPI Section */}
@@ -106,7 +122,7 @@ const PerformanceReports = () => {
             </div>
           </div>
           <div className="h-[350px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={athleteStats}>
                 <PolarGrid stroke="#f3f4f6" />
                 <PolarAngleAxis 
@@ -150,7 +166,7 @@ const PerformanceReports = () => {
             </div>
           </div>
           <div className="h-[350px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={tournamentData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis 

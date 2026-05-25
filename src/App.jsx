@@ -5,7 +5,7 @@ import Dashboard from './pages/Dashboard';
 import NewAdmission from './pages/NewAdmission';
 import TrialRegistrations from './pages/TrialRegistrations';
 import AdmissionApproval from './pages/AdmissionApproval';
-import DocumentVerification from './pages/DocumentVerification';
+import TotalAdmission from './pages/TotalAdmission';
 import StudentProfiles from './pages/students/StudentProfiles';
 import ParentGuardianDetails from './pages/students/ParentGuardianDetails';
 import MedicalInformation from './pages/students/MedicalInformation';
@@ -22,8 +22,8 @@ import CoachAssignment from './pages/training/CoachAssignment';
 import GroundAllocation from './pages/training/GroundAllocation';
 
 // Coach Management
+import TotalCoach from './pages/coach/TotalCoach';
 import CoachProfiles from './pages/coach/CoachProfiles';
-import CoachAttendancePage from './pages/coach/CoachAttendance';
 import AssignedBatches from './pages/coach/AssignedBatches';
 
 // Reports & Analytics
@@ -61,7 +61,7 @@ function App() {
             <Route path="new" element={<NewAdmission />} />
             <Route path="trial" element={<TrialRegistrations />} />
             <Route path="approval" element={<AdmissionApproval />} />
-            <Route path="documents" element={<DocumentVerification />} />
+            <Route path="list" element={<TotalAdmission />} />
           </Route>
           <Route path="training">
             <Route path="batch-creation" element={<BatchCreation />} />
@@ -70,8 +70,10 @@ function App() {
             <Route path="ground-allocation" element={<GroundAllocation />} />
           </Route>
           <Route path="coach">
+            <Route index element={<Navigate to="/coach/total" replace />} />
+            <Route path="total" element={<TotalCoach />} />
             <Route path="profiles" element={<CoachProfiles />} />
-            <Route path="attendance" element={<CoachAttendancePage />} />
+            <Route path="attendance" element={<Navigate to="/attendance/coaches" replace />} />
             <Route path="assigned-batches" element={<AssignedBatches />} />
           </Route>
           <Route path="reports">

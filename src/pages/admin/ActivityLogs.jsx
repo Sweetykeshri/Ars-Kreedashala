@@ -110,10 +110,16 @@ const ActivityLogs = () => {
                 <h3 className="text-sm font-black text-gray-900 uppercase">System Stream</h3>
               </div>
               <div className="flex items-center gap-3">
-                 <button className="p-3 bg-white border border-gray-100 text-gray-400 rounded-xl hover:text-blue-600 transition-all shadow-sm">
+                 <button 
+                   onClick={() => alert('Launching cryptographic date selector for tactical logs...')}
+                   className="p-3 bg-white border border-gray-100 text-gray-400 rounded-xl hover:text-blue-600 transition-all shadow-sm"
+                 >
                    <Calendar size={18} />
                  </button>
-                 <button className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 border border-gray-100 rounded-xl font-black uppercase text-[10px] hover:bg-gray-50 transition-all shadow-sm">
+                 <button 
+                   onClick={() => alert('Compiling tactical intelligence report... Downloading encrypted CSV.')}
+                   className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 border border-gray-100 rounded-xl font-black uppercase text-[10px] hover:bg-gray-50 transition-all shadow-sm"
+                 >
                    <Download size={16} /> Export Intel
                  </button>
               </div>

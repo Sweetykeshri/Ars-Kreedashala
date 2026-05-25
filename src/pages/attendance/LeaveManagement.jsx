@@ -68,7 +68,13 @@ const LeaveManagement = () => {
             Apply for Leave
           </h2>
           
-          <form className="space-y-4 text-sm">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              alert('Leave application submitted to the Command Center. You will be notified of the decision via the priority relay.');
+            }}
+            className="space-y-4 text-sm"
+          >
             <div>
               <label className="block text-gray-700 font-semibold mb-1.5">Leave Type</label>
               <select className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-gray-700">
@@ -121,7 +127,10 @@ const LeaveManagement = () => {
             <p className="text-xs text-blue-100 leading-relaxed mb-4">
               All sick leaves exceeding 3 days MUST be supported by a medical certificate from a certified practitioner.
             </p>
-            <button className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition-all backdrop-blur-sm">
+            <button 
+              onClick={() => alert('Accessing secure document: Ars Kreedashala Personnel & Cadet Leave Protocol v2.1...')}
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition-all backdrop-blur-sm"
+            >
               Read Leave Policy
             </button>
           </div>
@@ -184,15 +193,24 @@ const LeaveManagement = () => {
                   <div className="flex md:flex-col lg:flex-row items-center gap-2 w-full md:w-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     {req.status === 'Pending' ? (
                       <>
-                        <button className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm transition-all focus:ring-2 focus:ring-green-400 focus:ring-offset-1">
+                        <button 
+                          onClick={() => alert(`Authorization Confirmed: Leave for ${req.user} has been APPROVED.`)}
+                          className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 shadow-sm transition-all focus:ring-2 focus:ring-green-400 focus:ring-offset-1"
+                        >
                           <CheckCircle size={14} /> Approve
                         </button>
-                        <button className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm transition-all focus:ring-2 focus:ring-red-400 focus:ring-offset-1">
+                        <button 
+                          onClick={() => alert(`Authorization Refused: Leave for ${req.user} has been REJECTED.`)}
+                          className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 shadow-sm transition-all focus:ring-2 focus:ring-red-400 focus:ring-offset-1"
+                        >
                           <XCircle size={14} /> Reject
                         </button>
                       </>
                     ) : (
-                      <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200">
+                      <button 
+                        onClick={() => alert(`Accessing full activity log for mission context ${req.id}...`)}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200"
+                      >
                         <MoreVertical size={18} />
                       </button>
                     )}

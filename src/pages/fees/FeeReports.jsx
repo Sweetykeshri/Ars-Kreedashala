@@ -67,7 +67,7 @@ const FeeReports = () => {
       {/* Stats Board */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition-all hover:translate-y-[-4px] hover:shadow-xl hover:shadow-gray-100 group">
+          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-gray-100 group">
             <div className="flex justify-between items-start mb-6">
               <div className="p-3 bg-gray-50 rounded-2xl group-hover:scale-110 transition-transform">
                 {stat.icon}
@@ -101,7 +101,7 @@ const FeeReports = () => {
               </div>
             </div>
           </div>
-          <div className="h-[350px]">
+          <div className="h-87.5">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={revenueData}>
                 <defs>
@@ -127,7 +127,7 @@ const FeeReports = () => {
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col">
           <h3 className="text-lg font-black text-gray-800 tracking-tight mb-1">Revenue Stream</h3>
           <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-10">Breakdown by fee type</p>
-          <div className="h-[250px] relative mb-10">
+          <div className="h-62.5 relative mb-10">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -172,7 +172,7 @@ const FeeReports = () => {
           </div>
           <div className="flex flex-wrap gap-8 justify-between">
             {methodData.map((method, i) => (
-              <div key={i} className="flex-1 min-w-[150px] p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:bg-white transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50">
+              <div key={i} className="flex-1 min-w-37.5 p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:bg-white transition-all hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50">
                 <div className="flex items-center gap-4 mb-4 font-black text-gray-400 group-hover:text-blue-600 transition-colors uppercase text-[10px] tracking-widest">
                   <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center">
                     <DollarSign size={16} />

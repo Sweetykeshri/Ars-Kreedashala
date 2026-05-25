@@ -44,7 +44,7 @@ export const KPICard = ({ title, value, detail, trend, trendValue, icon: Icon, c
   );
 };
 
-export const ReportHeader = ({ title, subtitle, icon: Icon }) => {
+export const ReportHeader = ({ title, subtitle, icon: Icon, actions }) => {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-4">
       <div>
@@ -55,10 +55,12 @@ export const ReportHeader = ({ title, subtitle, icon: Icon }) => {
         <p className="text-gray-500 font-bold uppercase text-xs tracking-widest mt-1">{subtitle}</p>
       </div>
       <div className="flex items-center gap-3">
-        <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-          <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Live System Feed</span>
-        </div>
+        {actions ? actions : (
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Live System Feed</span>
+          </div>
+        )}
       </div>
     </div>
   );
