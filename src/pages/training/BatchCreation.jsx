@@ -13,7 +13,8 @@ import {
   ChevronRight,
   User,
   Activity,
-  Trophy
+  Trophy,
+  X
 } from 'lucide-react';
 
 const BatchCreation = () => {
@@ -34,6 +35,83 @@ const BatchCreation = () => {
     { id: 'B-004', name: 'B-Badminton Weekend', sport: 'Badminton', ageGroup: 'U-14', capacity: '15', students: '8', timing: '09:00 AM - 11:00 AM', coach: 'Pullela Gopichand', startDate: '2026-03-01', status: 'Upcoming' },
   ];
 
+  const BatchForm = ({ onClear, onSubmit }) => (
+    <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Batch Name</label>
+        <input type="text" placeholder="Elite Cricket Morning" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Batch Code</label>
+        <input type="text" placeholder="B-005" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Sport</label>
+        <select className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm">
+          <option>Select Sport</option>
+          <option>Cricket</option>
+          <option>Football</option>
+          <option>Tennis</option>
+          <option>Badminton</option>
+        </select>
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Age Group</label>
+        <select className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm">
+          <option>Under 12</option>
+          <option>Under 15</option>
+          <option>Under 18</option>
+          <option>Elite/Open</option>
+        </select>
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Start Date</label>
+        <input type="date" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Training Days</label>
+        <input type="text" placeholder="Mon, Wed, Fri" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Start Time</label>
+        <input type="time" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">End Time</label>
+        <input type="time" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Head Coach</label>
+        <input type="text" placeholder="Coach Name" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Ground / Court</label>
+        <input type="text" placeholder="Ground A" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Maximum Students</label>
+        <input type="number" placeholder="20" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Batch Status</label>
+        <select className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm">
+          <option>Active</option>
+          <option>Upcoming</option>
+          <option>Full</option>
+          <option>Inactive</option>
+        </select>
+      </div>
+      <div className="lg:col-span-3 flex flex-col sm:flex-row gap-3 sm:justify-end">
+        <button type="button" onClick={onClear} className="px-6 py-3 rounded-2xl border border-[#e7e2cf] font-bold text-gray-500 uppercase tracking-widest text-[11px] hover:bg-[#f7f6f0] transition-all">
+          Clear Form
+        </button>
+        <button type="button" onClick={onSubmit} className="px-6 py-3 rounded-2xl bg-[#8b8b00] text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-[#7a7a00] shadow-xl shadow-[#8b8b00]/20 transition-all">
+          Create Batch
+        </button>
+      </div>
+    </form>
+  );
+
   return (
     <div className="space-y-8 pb-10">
       {/* Header */}
@@ -43,7 +121,8 @@ const BatchCreation = () => {
           <p className="text-gray-500 text-sm mt-1">Organize and monitor training units across the academy.</p>
         </div>
         <button 
-          onClick={() => alert(`Launching Deployment Wizard for New Training Batch...`)}
+          type="button"
+          onClick={() => setIsFormOpen(true)}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-200"
         >
           <Plus size={20} />
@@ -196,72 +275,29 @@ const BatchCreation = () => {
 
       {/* Optional Form Modal (Mock) */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-md">
-          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fadeIn">
-            <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 bg-gray-900/40 backdrop-blur-md overflow-y-auto">
+          <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fadeIn my-6">
+            <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Configure New Training Unit</h3>
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Operational Protocol 102-B</p>
+                <h3 className="text-xl font-bold text-gray-900">Deploy New Batch</h3>
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Batch creation & deployment</p>
               </div>
               <button 
+                type="button"
                 onClick={() => setIsFormOpen(false)}
                 className="p-2 hover:bg-gray-100 rounded-xl text-gray-400"
               >
                 <X size={20} />
               </button>
             </div>
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Batch Designation</label>
-                <input type="text" placeholder="e.g. Advanced Striker Unit" className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 transition-all font-medium text-sm" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Sporting Discipline</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 transition-all font-medium text-sm">
-                  <option>Select Sport</option>
-                  <option>Cricket</option>
-                  <option>Football</option>
-                  <option>Tennis</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Age Grouping</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 transition-all font-medium text-sm">
-                  <option>Under 12</option>
-                  <option>Under 15</option>
-                  <option>Under 18</option>
-                  <option>Elite/Open</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unit Capacity</label>
-                <input type="number" placeholder="20" className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 transition-all font-medium text-sm" />
-              </div>
-              <div className="col-span-full space-y-1">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Commanding Coach</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 transition-all font-medium text-sm">
-                  <option>Assign Coach</option>
-                  <option>Rajesh Kumar</option>
-                  <option>Amit Singh</option>
-                </select>
-              </div>
-            </div>
-            <div className="p-8 bg-gray-50/50 flex gap-4">
-              <button 
-                onClick={() => setIsFormOpen(false)}
-                className="flex-1 px-6 py-4 rounded-2xl border border-gray-100 font-bold text-gray-400 uppercase tracking-widest text-[11px] hover:bg-white transition-all outline-none"
-              >
-                Abort Protocol
-              </button>
-              <button 
-                onClick={() => {
-                  alert('Unit deployment sequence initiated! New training batch is now live.');
+            <div className="p-6">
+              <BatchForm
+                onClear={() => alert('Form cleared.')}
+                onSubmit={() => {
+                  alert('New batch deployed successfully.');
                   setIsFormOpen(false);
                 }}
-                className="flex-1 px-6 py-4 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all outline-none"
-              >
-                Deploy Unit
-              </button>
+              />
             </div>
           </div>
         </div>

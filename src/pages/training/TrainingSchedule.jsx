@@ -1,207 +1,366 @@
-import React, { useState } from 'react';
-import { 
-  Calendar as CalendarIcon, 
-  ChevronLeft, 
-  ChevronRight, 
-  Clock, 
-  MapPin, 
-  User, 
-  Activity,
+import React, { useMemo, useState } from 'react';
+import {
   Download,
   Filter,
-  Users,
-  AlertTriangle
+  Plus,
+  Search,
+  ChevronDown
 } from 'lucide-react';
 
 const TrainingSchedule = () => {
-  const [selectedDay, setSelectedDay] = useState(new Date().getDay());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sportFilter, setSportFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [trainingDayFilter, setTrainingDayFilter] = useState('All');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  
   const schedules = [
-    { time: '06:00 AM', batch: 'Elite Cricket Morning', coach: 'Rajesh Kumar', field: 'Main Pitch A', type: 'High Intensity', students: '18/20' },
-    { time: '07:30 AM', batch: 'Advanced Tennis Uni', coach: 'Sania Mirza', field: 'Court 1', type: 'Tactical', students: '10/10' },
-    { time: '04:00 PM', batch: 'Junior Football Eve', coach: 'Amit Singh', field: 'Sector 4 (North)', type: 'Endurance', students: '22/25' },
-    { time: '05:30 PM', batch: 'U-14 Badminton', coach: 'Pullela Gopichand', field: 'Indoors Box 2', type: 'Skill Drills', students: '12/15' },
-    { time: '07:00 PM', batch: 'Professional Fitness', coach: 'Trainer K', field: 'Gym Area 1', type: 'Recovery', students: '15/20' },
+    {
+      id: 'ARS001',
+      batch: 'Elite Cricket Morning',
+      sport: 'Cricket',
+      coach: 'Rajesh Kumar',
+      days: 'Mon Wed Fri',
+      time: '06:00 - 08:00',
+      ground: 'Net 1',
+      status: 'Active'
+    },
+    {
+      id: 'ARS002',
+      batch: 'Junior Football Eve',
+      sport: 'Football',
+      coach: 'Amit Singh',
+      days: 'Tue Thu Sat',
+      time: '04:00 - 06:00',
+      ground: 'Field 2',
+      status: 'Upcoming'
+    },
+    {
+      id: 'ARS003',
+      batch: 'Fitness Evening Batch',
+      sport: 'Fitness',
+      coach: 'Priya Singh',
+      days: 'Mon Tue Thu',
+      time: '05:00 - 06:30',
+      ground: 'Fitness Zone',
+      status: 'Active'
+    },
+    {
+      id: 'ARS004',
+      batch: 'Badminton Weekend',
+      sport: 'Badminton',
+      coach: 'Rahul Verma',
+      days: 'Sat Sun',
+      time: '07:00 - 09:00',
+      ground: 'Court 1',
+      status: 'Upcoming'
+    }
   ];
 
-  const upcomingAlerts = [
-    { time: 'In 2h', title: 'Ground Maint.', desc: 'Sector B offline', severity: 'low' },
-    { time: 'Tomorrow', title: 'Coach Meeting', desc: 'Protocol Review', severity: 'med' },
-  ];
+  const filteredSchedules = useMemo(() => {
+    return schedules.filter((item) => {
+      const matchesSearch = [item.id, item.batch, item.coach, item.sport]
+        .some((field) => field.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesSport = sportFilter === 'All' || item.sport === sportFilter;
+      const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
+      const matchesDay = trainingDayFilter === 'All' || item.days.includes(trainingDayFilter);
+      return matchesSearch && matchesSport && matchesStatus && matchesDay;
+    });
+  }, [searchTerm, sportFilter, statusFilter, trainingDayFilter, schedules]);
+
+  const statusClass = (status) => {
+    if (status === 'Active') return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+    if (status === 'Upcoming') return 'bg-blue-50 text-blue-600 border-blue-100';
+    if (status === 'Completed') return 'bg-gray-100 text-gray-600 border-gray-200';
+    if (status === 'Cancelled') return 'bg-rose-50 text-rose-600 border-rose-100';
+    return 'bg-orange-50 text-orange-600 border-orange-100';
+  };
 
   return (
     <div className="space-y-8 pb-10">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Training Deployment Timeline</h2>
-          <p className="text-gray-500 text-sm mt-1">Operational schedule for all active units and facilities.</p>
+          <h2 className="text-2xl font-bold text-gray-900">Training Schedule List</h2>
+          <p className="text-gray-500 text-sm mt-1">Manage schedules across all training batches and facilities.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest">
-            <Filter size={16} />
-            <span>Filter Sector</span>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-200"
+          >
+            <Plus size={16} />
+            <span>Create Schedule</span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all text-xs font-bold uppercase tracking-widest shadow-lg shadow-gray-200">
+          <button
+            type="button"
+            onClick={() => alert('Exporting schedule list as CSV...')}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest"
+          >
             <Download size={16} />
-            <span>Export Registry</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Main Schedule Column */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Week Navigator */}
-          <div className="bg-white p-2 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between">
-            <button className="p-4 hover:bg-gray-50 rounded-2xl text-gray-400">
-              <ChevronLeft size={20} />
-            </button>
-            <div className="flex-1 flex justify-around items-center">
-              {weekDays.map((day, i) => (
-                <button 
-                  key={day}
-                  onClick={() => setSelectedDay(i)}
-                  className={`flex flex-col items-center gap-1.5 px-6 py-4 rounded-2xl transition-all duration-300 ${
-                    selectedDay === i 
-                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-100 scale-105' 
-                    : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="text-[10px] font-black uppercase tracking-widest">{day}</span>
-                  <span className="text-lg font-black leading-none">{12 + i}</span>
-                </button>
-              ))}
-            </div>
-            <button className="p-4 hover:bg-gray-50 rounded-2xl text-gray-400">
-              <ChevronRight size={20} />
-            </button>
+      <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search by Schedule ID, Batch, Coach, or Sport"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 text-sm font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-
-          {/* Timeline View */}
-          <div className="space-y-4">
-            {schedules.map((item, i) => (
-              <div key={i} className="group relative flex gap-6 items-start animate-fadeIn" style={{ animationDelay: `${i * 100}ms` }}>
-                {/* Time Indicator */}
-                <div className="w-24 pt-2 text-right">
-                    <p className="text-sm font-black text-gray-900 leading-none">{item.time.split(' ')[0]}</p>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-1">{item.time.split(' ')[1]}</p>
-                </div>
-
-                {/* Vertical Line */}
-                <div className="absolute left-[7.25rem] top-0 bottom-0 flex flex-col items-center">
-                    <div className="w-4 h-4 rounded-full bg-white border-4 border-blue-600 z-10"></div>
-                    <div className="w-[2px] flex-1 bg-gray-100 group-last:hidden"></div>
-                </div>
-
-                {/* Session Card */}
-                <div className="flex-1 bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm group-hover:border-blue-200 group-hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${
-                                item.type === 'High Intensity' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                                item.type === 'Tactical' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                'bg-emerald-50 text-emerald-600 border-emerald-100'
-                            }`}>
-                                {item.type}
-                            </span>
-                            <h4 className="text-sm font-black text-gray-900 uppercase tracking-tight">{item.batch}</h4>
-                        </div>
-                        <div className="flex flex-wrap gap-6">
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-                                <User size={14} className="text-blue-500" />
-                                <span>{item.coach}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-                                <MapPin size={14} className="text-rose-500" />
-                                <span>{item.field}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-                                <Users size={14} className="text-emerald-500" />
-                                <span>{item.students} Students</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] bg-gray-50 hover:bg-blue-600 hover:text-white rounded-xl transition-all">
-                        View Unit Details
-                    </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <button className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-100 rounded-2xl text-gray-600 hover:bg-gray-50 transition-colors text-xs font-bold uppercase tracking-widest">
+            <Filter size={16} />
+            <span>Advanced Filters</span>
+          </button>
         </div>
 
-        {/* Sidebar Alerts / Summary */}
-        <div className="space-y-6">
-          {/* Integrity Status */}
-          <div className="bg-gray-900 p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200 relative overflow-hidden group">
-            <div className="absolute -right-6 -top-6 w-32 h-32 bg-blue-600 opacity-20 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
-            <div className="relative z-10 space-y-6">
-                <div className="flex items-center justify-between">
-                    <Activity className="text-blue-500" size={24} />
-                    <span className="text-[10px] font-black text-white px-3 py-1 bg-white/10 rounded-full uppercase tracking-widest backdrop-blur-md">Live Status</span>
-                </div>
-                <div>
-                   <h3 className="text-xl font-black text-white leading-tight">SYSTEM<br/>INTEGRITY</h3>
-                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">All Sectors Fully Operational</p>
-                </div>
-                <div className="pt-4 border-t border-white/10">
-                    <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Global Load</span>
-                        <span className="text-[9px] font-black text-white uppercase tracking-widest">68%</span>
-                    </div>
-                    <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full w-2/3 bg-blue-500 rounded-full"></div>
-                    </div>
-                </div>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Sport</label>
+            <select
+              className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
+              value={sportFilter}
+              onChange={(e) => setSportFilter(e.target.value)}
+            >
+              <option>All</option>
+              <option>Cricket</option>
+              <option>Football</option>
+              <option>Fitness</option>
+              <option>Badminton</option>
+            </select>
           </div>
-
-          {/* Operational Alerts */}
-          <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                <AlertTriangle size={14} className="text-orange-500" />
-                Sector Alerts
-            </h3>
-            <div className="space-y-5">
-                {upcomingAlerts.map((alert, i) => (
-                    <div key={i} className="flex gap-4">
-                        <div className="w-12 text-center">
-                            <p className="text-[10px] font-black text-gray-400 uppercase leading-none">{alert.time}</p>
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-xs font-bold text-gray-900 uppercase tracking-tight leading-none">{alert.title}</p>
-                            <p className="text-[10px] text-gray-400 mt-1 font-medium">{alert.desc}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <button className="w-full mt-8 py-3 bg-gray-50 hover:bg-blue-50 hover:text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all">
-                Full Log
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Status</label>
+            <select
+              className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option>All</option>
+              <option>Active</option>
+              <option>Upcoming</option>
+              <option>Completed</option>
+              <option>Cancelled</option>
+              <option>Postponed</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Training Day</label>
+            <select
+              className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
+              value={trainingDayFilter}
+              onChange={(e) => setTrainingDayFilter(e.target.value)}
+            >
+              <option>All</option>
+              <option>Mon</option>
+              <option>Tue</option>
+              <option>Wed</option>
+              <option>Thu</option>
+              <option>Fri</option>
+              <option>Sat</option>
+              <option>Sun</option>
+            </select>
+          </div>
+          <div className="flex items-end">
+            <button
+              type="button"
+              className="w-full px-4 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest"
+              onClick={() => {
+                setSearchTerm('');
+                setSportFilter('All');
+                setStatusFilter('All');
+                setTrainingDayFilter('All');
+              }}
+            >
+              Reset Filters
             </button>
-          </div>
-
-          {/* Mini Calendar Hook */}
-          <div className="bg-blue-50/50 p-8 rounded-[2.5rem] border border-blue-100/50">
-             <div className="flex items-center gap-3 mb-6">
-                <CalendarIcon className="text-blue-600" size={20} />
-                <h3 className="text-xs font-black text-blue-900 uppercase tracking-widest">Session Overview</h3>
-             </div>
-             <div className="space-y-4">
-                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-tight">
-                    <span className="text-blue-400">Peak Hours</span>
-                    <span className="text-blue-900">06-08 AM</span>
-                </div>
-                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-tight">
-                    <span className="text-blue-400">Total Units</span>
-                    <span className="text-blue-900">42 Sessions</span>
-                </div>
-             </div>
           </div>
         </div>
       </div>
+
+      <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50/50 border-b border-gray-100">
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Schedule ID</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Batch Name</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Sport</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Coach</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Training Days</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Time</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Ground</th>
+                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filteredSchedules.map((item) => (
+                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-5 text-sm font-semibold text-gray-900">{item.id}</td>
+                  <td className="px-6 py-5 text-sm font-semibold text-gray-900">{item.batch}</td>
+                  <td className="px-6 py-5 text-sm text-gray-600 font-semibold">{item.sport}</td>
+                  <td className="px-6 py-5 text-sm text-gray-600 font-semibold">{item.coach}</td>
+                  <td className="px-6 py-5 text-sm text-gray-600 font-semibold">{item.days}</td>
+                  <td className="px-6 py-5 text-sm text-gray-600 font-semibold">{item.time}</td>
+                  <td className="px-6 py-5 text-sm text-gray-600 font-semibold">{item.ground}</td>
+                  <td className="px-6 py-5">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${statusClass(item.status)}`}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-right">
+                    <details className="relative inline-block">
+                      <summary className="list-none inline-flex items-center gap-2 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] bg-gray-50 hover:bg-blue-600 hover:text-white rounded-xl transition-all cursor-pointer">
+                        Manage
+                        <ChevronDown size={14} />
+                      </summary>
+                      <div className="absolute right-0 mt-2 w-52 rounded-xl border border-gray-100 bg-white shadow-xl z-10">
+                        {['View Details', 'Edit Schedule', 'Mark Attendance', 'Reschedule', 'Cancel Schedule'].map((action) => (
+                          <button
+                            key={action}
+                            type="button"
+                            className="w-full text-left px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                          >
+                            {action}
+                          </button>
+                        ))}
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              ))}
+              {filteredSchedules.length === 0 && (
+                <tr>
+                  <td colSpan="9" className="px-6 py-10 text-center text-gray-500 font-medium">
+                    No schedules match the current filters.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-3xl rounded-[2rem] bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Create Training Schedule</h3>
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Schedule setup</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+            <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Schedule ID</label>
+                <input
+                  className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium"
+                  placeholder="ARS001"
+                />
+                <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300">Use ARS prefix (e.g. ARS001)</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Batch Name</label>
+                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium" placeholder="Batch Name" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sport</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
+                  <option>Select Sport</option>
+                  <option>Cricket</option>
+                  <option>Football</option>
+                  <option>Fitness</option>
+                  <option>Badminton</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Coach</label>
+                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium" placeholder="Coach Name" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Training Days</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
+                  <option>Select Days</option>
+                  <option>Mon Wed Fri</option>
+                  <option>Tue Thu Sat</option>
+                  <option>Mon Tue Thu</option>
+                  <option>Sat Sun</option>
+                  <option>Daily</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Start Time</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
+                  <option>Select Start</option>
+                  <option>05:00</option>
+                  <option>06:00</option>
+                  <option>07:00</option>
+                  <option>08:00</option>
+                  <option>16:00</option>
+                  <option>17:00</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">End Time</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
+                  <option>Select End</option>
+                  <option>06:30</option>
+                  <option>07:30</option>
+                  <option>08:00</option>
+                  <option>09:00</option>
+                  <option>18:00</option>
+                  <option>19:00</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ground</label>
+                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium" placeholder="Ground / Court" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
+                  <option>Active</option>
+                  <option>Upcoming</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                  <option>Postponed</option>
+                </select>
+              </div>
+            </div>
+            <div className="px-6 py-5 border-t border-gray-100 flex flex-col sm:flex-row gap-3 sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="px-6 py-3 rounded-xl border border-gray-100 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="px-6 py-3 rounded-xl bg-blue-600 text-white text-xs font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200"
+              >
+                Create Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

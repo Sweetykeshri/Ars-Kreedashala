@@ -18,13 +18,13 @@ import AttendanceReports from './pages/attendance/AttendanceReports';
 // Training & Batch Operations
 import BatchCreation from './pages/training/BatchCreation';
 import TrainingSchedule from './pages/training/TrainingSchedule';
-import CoachAssignment from './pages/training/CoachAssignment';
 import GroundAllocation from './pages/training/GroundAllocation';
 
 // Coach Management
 import TotalCoach from './pages/coach/TotalCoach';
 import CoachProfiles from './pages/coach/CoachProfiles';
 import AssignedBatches from './pages/coach/AssignedBatches';
+import CoachRegistration from './pages/coach/CoachRegistration';
 
 // Reports & Analytics
 import AdmissionReports from './pages/reports/AdmissionReports';
@@ -66,13 +66,14 @@ function App() {
           <Route path="training">
             <Route path="batch-creation" element={<BatchCreation />} />
             <Route path="schedule" element={<TrainingSchedule />} />
-            <Route path="coach-assignment" element={<CoachAssignment />} />
+            <Route path="coach-assignment" element={<Navigate to="/training/batch-creation" replace />} />
             <Route path="ground-allocation" element={<GroundAllocation />} />
           </Route>
           <Route path="coach">
             <Route index element={<Navigate to="/coach/total" replace />} />
             <Route path="total" element={<TotalCoach />} />
             <Route path="profiles" element={<CoachProfiles />} />
+            <Route path="registration" element={<CoachRegistration />} />
             <Route path="attendance" element={<Navigate to="/attendance/coaches" replace />} />
             <Route path="assigned-batches" element={<AssignedBatches />} />
           </Route>

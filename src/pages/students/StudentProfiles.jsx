@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Search, Plus, Filter, MoreVertical, Download } from 'lucide-react';
 
 const StudentProfiles = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const students = [
     { id: 'ARS001', name: 'Arjun Mehra', age: 14, gender: 'Male', sport: 'Cricket', batch: 'Afternoon B1', contact: '+91 98765 43210', status: 'Active' },
     { id: 'ARS002', name: 'Sana Khan', age: 12, gender: 'Female', sport: 'Badminton', batch: 'Morning A2', contact: '+91 98765 43211', status: 'Active' },
     { id: 'ARS003', name: 'Kabir Singh', age: 15, gender: 'Male', sport: 'Football', batch: 'Evening C1', contact: '+91 98765 43212', status: 'Inactive' },
     { id: 'ARS004', name: 'Riya Verma', age: 13, gender: 'Female', sport: 'Table Tennis', batch: 'Morning A1', contact: '+91 98765 43213', status: 'Active' },
   ];
+
+  const totalPages = Math.max(1, Math.ceil(students.length / pageSize));
+  const visibleStudents = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return students.slice(startIndex, startIndex + pageSize);
+  }, [currentPage, students]);
 
   return (
     <div className="space-y-6">
@@ -22,12 +30,6 @@ const StudentProfiles = () => {
             className="flex items-center gap-2 px-4 py-2 border border-gray-100 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <Download size={18} /> Export
-          </button>
-          <button 
-            onClick={() => alert('Launching Add New Student module...')}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-sm"
-          >
-            <Plus size={18} /> Add Student
           </button>
         </div>
       </div>
@@ -75,7 +77,7 @@ const StudentProfiles = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {students.map((student) => (
+              {visibleStudents.map((student) => (
                 <tr key={student.id} className="hover:bg-gray-50/50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -104,7 +106,11 @@ const StudentProfiles = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-white rounded-md transition-all">
+                    <button
+                      type="button"
+                      onClick={() => alert(`Opening actions for ${student.name} (${student.id})`)}
+                      className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-white rounded-md transition-all"
+                    >
                       <MoreVertical size={18} />
                     </button>
                   </td>
@@ -115,12 +121,29 @@ const StudentProfiles = () => {
         </div>
 
         <div className="p-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-500">Showing 1 to 4 of 48 students</p>
+          <p className="text-sm text-gray-500">
+            Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, students.length)} of {students.length} students
+          </p>
           <div className="flex gap-2">
-            <button className="px-3 py-1 border border-gray-200 rounded text-sm disabled:opacity-50" disabled>Previous</button>
-            <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">1</button>
-            <button className="px-3 py-1 border border-gray-200 rounded text-sm">2</button>
-            <button className="px-3 py-1 border border-gray-200 rounded text-sm">Next</button>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              className="px-3 py-1 border border-gray-200 rounded text-sm disabled:opacity-50"
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <button className="px-3 py-1 bg-blue-600 text-white rounded text-sm">
+              {currentPage}
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              className="px-3 py-1 border border-gray-200 rounded text-sm disabled:opacity-50"
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

@@ -109,7 +109,6 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
       submenu: [
         { title: 'Batch Creation', path: '/training/batch-creation', icon: <LayoutGrid size={18} /> },
         { title: 'Training Schedule', path: '/training/schedule', icon: <Calendar size={18} /> },
-        { title: 'Coach Assignment', path: '/training/coach-assignment', icon: <Shield size={18} /> },
         { title: 'Ground Allocation', path: '/training/ground-allocation', icon: <MapPin size={18} /> },
       ]
     },
@@ -118,6 +117,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
       icon: <Users size={20} />,
       id: 'coach',
       submenu: [
+        { title: 'Coach Registration', path: '/coach/registration', icon: <UserPlus size={18} /> },
         { title: 'Total Coach', path: '/coach/total', icon: <Users size={18} /> },
         { title: 'Coach Profiles', path: '/coach/profiles', icon: <UserCircle size={18} /> },
         { title: 'Assigned Batches', path: '/coach/assigned-batches', icon: <LayoutGrid size={18} /> },

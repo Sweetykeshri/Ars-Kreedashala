@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Users, 
   Layers, 
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 const AssignedBatches = () => {
+  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const assignments = [
     {
       coachId: "C-001",
@@ -45,7 +46,11 @@ const AssignedBatches = () => {
           </h1>
           <p className="text-gray-500 font-bold uppercase text-xs tracking-widest mt-1">Operational workload and batch distribution control</p>
         </div>
-        <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all">
+        <button
+          type="button"
+          onClick={() => setIsDeployModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all"
+        >
           <Target size={18} /> New Deployment
         </button>
       </div>
@@ -171,6 +176,74 @@ const AssignedBatches = () => {
           </div>
         ))}
       </div>
+
+      {isDeployModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-[2rem] bg-white shadow-2xl overflow-hidden">
+            <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight">New Deployment</h3>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Assign coach to batches</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDeployModalOpen(false)}
+                className="px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+            <div className="px-8 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Coach</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium">
+                  <option>Select Coach</option>
+                  <option>Rabindranath Sarkar</option>
+                  <option>Sushant Singh</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Batch</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium">
+                  <option>Select Batch</option>
+                  <option>Elite Morning Cricket</option>
+                  <option>Junior Football Ops</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Deployment Window</label>
+                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium">
+                  <option>Select Window</option>
+                  <option>06:00 - 08:30</option>
+                  <option>07:00 - 09:00</option>
+                  <option>16:00 - 18:30</option>
+                  <option>17:00 - 19:00</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sector</label>
+                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl text-sm font-medium" placeholder="Ground A" />
+              </div>
+            </div>
+            <div className="px-8 py-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3 sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setIsDeployModalOpen(false)}
+                className="px-6 py-3 rounded-2xl border border-gray-100 font-bold text-gray-400 uppercase tracking-widest text-[11px] hover:bg-white transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDeployModalOpen(false)}
+                className="px-6 py-3 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all"
+              >
+                Deploy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

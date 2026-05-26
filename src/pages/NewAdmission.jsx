@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { admissionService } from '../services/admissionService';
 import { 
   Trophy, 
   MapPin, 
@@ -90,7 +91,14 @@ const NewAdmission = () => {
   };
 
   const handleSubmit = () => {
-    alert('Payment Initiated & Registration Form Submitted Successfully!');
+    try {
+      admissionService.addAdmission(formData);
+      alert('Payment Initiated & Registration Form Submitted Successfully!');
+      // Reset form or redirect if needed
+    } catch (error) {
+      console.error('Error submitting admission:', error);
+      alert('Failed to submit admission. Please try again.');
+    }
   };
 
   const SectionHeader = ({ title }) => (
