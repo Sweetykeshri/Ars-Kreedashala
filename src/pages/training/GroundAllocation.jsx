@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  Plus, 
   MapPin, 
   Clock, 
   AlertTriangle, 
-  CheckCircle2, 
   Zap, 
   ShieldCheck,
   Calendar,
@@ -27,20 +25,20 @@ const GroundAllocation = () => {
   ];
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6 space-y-8 pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Infrastructure & Sector Allocation</h2>
           <p className="text-gray-500 text-sm mt-1">Monitor facility integrity and manage operational sectors.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-200">
+        <button className="flex w-full sm:w-auto items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-200">
           <Zap size={20} />
           <span>New Sector Booking</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {sectors.map((sector, i) => (
           <div key={sector.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm animate-fadeIn" style={{ animationDelay: `${i * 100}ms` }}>
             <div className="flex justify-between items-start mb-6">
@@ -86,10 +84,10 @@ const GroundAllocation = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
          {/* Allocation Timeline */}
-         <div className="xl:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+         <div className="md:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+          <div className="p-6 sm:p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Operational Protocol Ledger</h3>
                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mt-1 items-center flex gap-2">
@@ -97,12 +95,12 @@ const GroundAllocation = () => {
                        Real-time conflict detection active
                    </p>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer hover:bg-gray-100 transition-all">
+            <div className="flex items-center justify-center gap-2 bg-gray-50 px-4 py-2 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest cursor-pointer hover:bg-gray-100 transition-all w-full sm:w-auto">
                     <span>Export Ledger</span>
                     <ChevronDown size={14} />
                 </div>
             </div>
-            <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
                <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-gray-50/50">
@@ -140,6 +138,39 @@ const GroundAllocation = () => {
                   </tbody>
                </table>
             </div>
+
+            <div className="md:hidden p-4 space-y-4">
+              {allocations.map((item, i) => (
+                <article key={i} className="rounded-3xl border border-gray-100 bg-gray-50/60 p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Time Window</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Clock size={14} className="text-blue-500 opacity-50" />
+                        <p className="text-sm font-bold text-gray-900">{item.time}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                      item.status === 'Active' ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      <span className={`w-1 h-1 rounded-full ${item.status === 'Active' ? 'bg-white animate-pulse' : 'bg-gray-400'}`} />
+                      {item.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-white p-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Target Sector</p>
+                      <p className="mt-1 text-sm font-semibold text-gray-900 whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{item.sector}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Assigned Unit</p>
+                      <p className="mt-1 text-sm font-semibold text-blue-600 whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{item.batch}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
          </div>
 
          {/* Right Column: Alerts & Conflict Tracker */}
@@ -169,11 +200,11 @@ const GroundAllocation = () => {
                     <Calendar className="text-blue-600" size={20} />
                     <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">Utilization Heat</h3>
                 </div>
-                <div className="grid grid-cols-7 gap-2">
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-2.5">
                     {[...Array(31)].map((_, i) => (
                         <div 
                           key={i} 
-                          className={`aspect-square rounded-lg flex items-center justify-center text-[10px] font-black ${
+                          className={`aspect-square rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] font-black ${
                             i === 11 ? 'bg-blue-600 text-white' : 
                             [5, 12, 19, 26].includes(i) ? 'bg-gray-100 text-gray-400' : 
                             'bg-gray-50 text-gray-400'

@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   Plus, 
   Search, 
   Filter, 
   Shield, 
   User, 
-  CheckCircle2, 
-  Clock, 
   Award,
-  MoreVertical,
   Activity,
   ChevronRight,
   Star
@@ -29,8 +26,21 @@ const CoachAssignment = () => {
     { batch: 'Junior Football Eve', coach: 'Amit Singh', days: 'Tue, Thu, Sat', shift: 'Evening', integrity: 'Optimal' },
   ];
 
+  const filteredCoaches = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    if (!query) {
+      return coaches;
+    }
+
+    return coaches.filter((coach) => (
+      [coach.id, coach.name, coach.sport, coach.level, coach.exp, coach.assigned]
+        .some((field) => field.toLowerCase().includes(query))
+    ));
+  }, [searchTerm, coaches]);
+
   return (
-    <div className="space-y-8 pb-10">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6 space-y-8 pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -43,9 +53,9 @@ const CoachAssignment = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left Column: Staff Cards */}
-        <div className="xl:col-span-2 space-y-6">
+        <div className="md:col-span-2 space-y-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
              <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -53,6 +63,8 @@ const CoachAssignment = () => {
                   type="text" 
                   placeholder="Search specialists..." 
                   className="w-full pl-12 pr-4 py-2 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-500/10 text-sm font-medium"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
              </div>
              <div className="flex items-center gap-2">
@@ -66,7 +78,7 @@ const CoachAssignment = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {coaches.map((coach, i) => (
+            {filteredCoaches.map((coach, i) => (
               <div key={coach.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover-card animate-fadeIn" style={{ animationDelay: `${i * 100}ms` }}>
                 <div className="flex justify-between items-start mb-6">
                   <div className="relative">
@@ -113,6 +125,12 @@ const CoachAssignment = () => {
                 </div>
               </div>
             ))}
+
+            {filteredCoaches.length === 0 && (
+              <div className="md:col-span-2 rounded-[2.5rem] border border-dashed border-gray-200 bg-white p-6 text-center text-sm font-medium text-gray-500">
+                No specialists match the current search.
+              </div>
+            )}
           </div>
         </div>
 
@@ -136,7 +154,7 @@ const CoachAssignment = () => {
                             </div>
                             <div className="mt-3 flex items-center gap-3">
                                 <span className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">{assign.days}</span>
-                                <div className="h-[1px] flex-1 bg-white/10"></div>
+                                <div className="h-px flex-1 bg-white/10"></div>
                                 <span className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">{assign.shift}</span>
                             </div>
                         </div>

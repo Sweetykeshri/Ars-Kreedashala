@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   Plus, 
   Search, 
   Filter, 
-  MoreVertical, 
   Edit2, 
   Trash2, 
   Users, 
   Clock, 
   Calendar,
   LayoutGrid,
-  ChevronRight,
   User,
   Activity,
   Trophy,
@@ -34,6 +32,19 @@ const BatchCreation = () => {
     { id: 'B-003', name: 'Advanced Tennis Uni', sport: 'Tennis', ageGroup: 'U-19', capacity: '10', students: '10', timing: '07:00 AM - 09:00 AM', coach: 'Sania Mirza', startDate: '2026-01-10', status: 'Full' },
     { id: 'B-004', name: 'B-Badminton Weekend', sport: 'Badminton', ageGroup: 'U-14', capacity: '15', students: '8', timing: '09:00 AM - 11:00 AM', coach: 'Pullela Gopichand', startDate: '2026-03-01', status: 'Upcoming' },
   ];
+
+  const filteredBatches = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    if (!query) {
+      return batches;
+    }
+
+    return batches.filter((batch) => (
+      [batch.id, batch.name, batch.sport, batch.ageGroup, batch.coach]
+        .some((field) => field.toLowerCase().includes(query))
+    ));
+  }, [searchTerm, batches]);
 
   const BatchForm = ({ onClear, onSubmit }) => (
     <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,7 +124,7 @@ const BatchCreation = () => {
   );
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6 space-y-8 pb-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -133,7 +144,7 @@ const BatchCreation = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover-card">
+          <div key={i} className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm hover-card">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-gray-50 rounded-2xl">{stat.icon}</div>
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{stat.trend}</span>
@@ -145,7 +156,7 @@ const BatchCreation = () => {
       </div>
 
       {/* Filters & Search */}
-      <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -169,8 +180,8 @@ const BatchCreation = () => {
       </div>
 
       {/* Batch Table/List */}
-      <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-100">
@@ -183,7 +194,7 @@ const BatchCreation = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {batches.map((batch) => (
+              {filteredBatches.map((batch) => (
                 <tr key={batch.id} className="hover:bg-gray-50/50 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-3">
@@ -268,15 +279,98 @@ const BatchCreation = () => {
                   </td>
                 </tr>
               ))}
+              {filteredBatches.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="px-8 py-10 text-center text-gray-500 font-medium">
+                    No batches match the current search.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
+        </div>
+
+        <div className="md:hidden p-4 space-y-4">
+          {filteredBatches.map((batch) => (
+            <article key={batch.id} className="rounded-3xl border border-gray-100 bg-gray-50/60 p-4 space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{batch.id} • {batch.ageGroup}</p>
+                  <h3 className="mt-1 text-base font-bold text-gray-900 leading-tight whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{batch.name}</h3>
+                  <p className="mt-1 text-xs font-semibold text-gray-600">{batch.sport} • {batch.coach}</p>
+                </div>
+                <span className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                  batch.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                  batch.status === 'Full' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                  'bg-blue-50 text-blue-600 border-blue-100'
+                }`}>
+                  {batch.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Timing</p>
+                  <p className="mt-1 font-semibold text-gray-900">{batch.timing}</p>
+                </div>
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coach</p>
+                  <p className="mt-1 font-semibold text-gray-900 whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{batch.coach}</p>
+                </div>
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Load</p>
+                  <div className="mt-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-gray-400">
+                    <span>Students</span>
+                    <span className="text-gray-900">{batch.students}/{batch.capacity}</span>
+                  </div>
+                  <div className="mt-2 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-1000 ${parseInt(batch.students) >= parseInt(batch.capacity) ? 'bg-orange-500' : 'bg-blue-600'}`}
+                      style={{ width: `${(parseInt(batch.students) / parseInt(batch.capacity)) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Start Date</p>
+                  <p className="mt-1 font-semibold text-gray-900">{batch.startDate}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => alert(`Configuring modifications for batch: ${batch.id}`)}
+                  className="flex-1 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm(`Security Alert: Are you sure you want to decommission batch ${batch.id}?`)) {
+                      alert(`Batch ${batch.id} has been decommissioned.`);
+                    }
+                  }}
+                  className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-rose-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </article>
+          ))}
+
+          {filteredBatches.length === 0 && (
+            <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm font-medium text-gray-500">
+              No batches match the current search.
+            </div>
+          )}
         </div>
       </div>
 
       {/* Optional Form Modal (Mock) */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 bg-gray-900/40 backdrop-blur-md overflow-y-auto">
-          <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fadeIn my-6">
+        <div className="fixed inset-0 z-60 flex items-start justify-center p-4 bg-gray-900/40 backdrop-blur-md overflow-y-auto">
+          <div className="bg-white w-full max-w-4xl rounded-4xl shadow-2xl overflow-hidden animate-fadeIn my-6">
             <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">Deploy New Batch</h3>

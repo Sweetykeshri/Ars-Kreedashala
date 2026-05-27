@@ -77,7 +77,7 @@ const TrainingSchedule = () => {
   };
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6 space-y-8 pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Training Schedule List</h2>
@@ -103,7 +103,7 @@ const TrainingSchedule = () => {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+      <div className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="relative flex-1 max-w-2xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -185,8 +185,8 @@ const TrainingSchedule = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-100">
@@ -247,12 +247,72 @@ const TrainingSchedule = () => {
             </tbody>
           </table>
         </div>
+
+        <div className="md:hidden p-4 space-y-4">
+          {filteredSchedules.map((item) => (
+            <article key={item.id} className="rounded-3xl border border-gray-100 bg-gray-50/60 p-4 space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{item.id}</p>
+                  <h3 className="mt-1 text-base font-bold text-gray-900 leading-tight whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{item.batch}</h3>
+                  <p className="mt-1 text-xs font-semibold text-gray-600">{item.sport} • {item.coach}</p>
+                </div>
+                <span className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${statusClass(item.status)}`}>
+                  {item.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Training Days</p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900">{item.days}</p>
+                </div>
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Time</p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900">{item.time}</p>
+                </div>
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ground</p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900">{item.ground}</p>
+                </div>
+                <div className="rounded-2xl bg-white p-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coach</p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900 whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{item.coach}</p>
+                </div>
+              </div>
+
+              <details className="relative">
+                <summary className="list-none inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 shadow-sm cursor-pointer">
+                  Manage
+                  <ChevronDown size={14} />
+                </summary>
+                <div className="mt-3 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg">
+                  {['View Details', 'Edit Schedule', 'Mark Attendance', 'Reschedule', 'Cancel Schedule'].map((action) => (
+                    <button
+                      key={action}
+                      type="button"
+                      className="w-full px-4 py-3 text-left text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                    >
+                      {action}
+                    </button>
+                  ))}
+                </div>
+              </details>
+            </article>
+          ))}
+
+          {filteredSchedules.length === 0 && (
+            <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm font-medium text-gray-500">
+              No schedules match the current filters.
+            </div>
+          )}
+        </div>
       </div>
 
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-[2rem] bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-3xl rounded-4xl bg-white shadow-2xl my-6">
+            <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Create Training Schedule</h3>
                 <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Schedule setup</p>

@@ -111,7 +111,7 @@ const NewAdmission = () => {
   );
 
   return (
-    <div className="w-full bg-white shadow-2xl p-4 md:p-6 lg:p-8 font-serif text-[#444] rounded-sm min-h-screen lg:min-h-0">
+    <div className="w-full max-w-6xl mx-auto bg-white shadow-2xl p-4 md:p-6 lg:p-8 font-serif text-[#444] rounded-sm min-h-0">
       {/* Top Header */}
       <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-6 border-b-2 border-gray-100 pb-4">
         <div className="flex items-center gap-5">
@@ -164,7 +164,7 @@ const NewAdmission = () => {
         {/* Step 1: Personal Information */}
         {currentStep === 1 && (
           <div className="animate-in fade-in slide-in-from-right-8 duration-700">
-            <div className="flex flex-col lg:flex-row gap-12 item-start">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
               
               {/* Fields Container (Left Side on Desktop) */}
               <div className="flex-1 space-y-6">
@@ -173,7 +173,7 @@ const NewAdmission = () => {
                 <div className="grid grid-cols-1 gap-5">
                   {/* Student Name */}
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    <label className="text-[10px] font-black uppercase w-36 shrink-0 text-gray-600 tracking-wider">Student Name <span className="text-red-500">*</span></label>
+                    <label className="text-[10px] font-black uppercase w-full md:w-36 shrink-0 text-gray-600 tracking-wider">Student Name <span className="text-red-500">*</span></label>
                     <input type="text" className="flex-1 border-b-2 border-gray-100 focus:border-[#8B8B00] outline-none py-1 text-sm font-bold transition-all placeholder:text-gray-200" placeholder="ENTER PLAYER'S FULL NAME" />
                   </div>
 
@@ -262,11 +262,11 @@ const NewAdmission = () => {
               </div>
 
               {/* Photos & Documents Section (Right Side on Desktop) */}
-              <div className="w-full lg:w-48 shrink-0 flex flex-col gap-8 items-center border-l-0 lg:border-l-2 lg:border-gray-50 lg:pl-8">
+              <div className="w-full md:w-56 lg:w-48 shrink-0 flex flex-col gap-8 items-center border-l-0 md:border-l-2 md:border-gray-50 md:pl-8">
                 {/* Photo Upload */}
                 <div className="w-full">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 text-center">Portrait</p>
-                  <div className="aspect-[3/4] w-full max-w-[140px] mx-auto border-4 border-dashed border-gray-100 bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-3 text-center group relative cursor-pointer hover:border-[#8B8B00] hover:bg-[#8B8B00]/5 transition-all shadow-inner">
+                    <div className="aspect-3/4 w-full max-w-35 md:max-w-40 mx-auto border-4 border-dashed border-gray-100 bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-3 text-center group relative cursor-pointer hover:border-[#8B8B00] hover:bg-[#8B8B00]/5 transition-all shadow-inner">
                     {photoPreview ? (
                       <img src={photoPreview} alt="Preview" className="w-full h-full object-cover rounded-xl shadow-lg border-2 border-white" />
                     ) : (
@@ -285,7 +285,7 @@ const NewAdmission = () => {
                 {/* Aadhaar Upload */}
                 <div className="w-full">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 text-center">Aadhaar Card</p>
-                  <div className={`aspect-[4/3] w-full max-w-[140px] mx-auto border-4 border-dashed rounded-2xl flex flex-col items-center justify-center p-3 text-center group relative cursor-pointer transition-all shadow-inner ${
+                  <div className={`aspect-4/3 w-full max-w-35 md:max-w-40 mx-auto border-4 border-dashed rounded-2xl flex flex-col items-center justify-center p-3 text-center group relative cursor-pointer transition-all shadow-inner ${
                     isReadingAadhaar ? 'border-[#8B8B00] bg-[#8B8B00]/5 animate-pulse' : 'border-gray-100 bg-gray-50 hover:border-[#8B8B00] hover:bg-[#8B8B00]/5'
                   }`}>
                     {aadhaarPreview ? (
@@ -318,7 +318,7 @@ const NewAdmission = () => {
         {/* Step 2: Sport & Fees */}
         {currentStep === 2 && (
           <div className="animate-in fade-in slide-in-from-right-8 duration-700">
-            <div className="flex flex-col lg:flex-row gap-12 items-start">
+            <div className="flex flex-col md:flex-row gap-12 items-start">
               
               {/* Left Column: Selection */}
               <div className="flex-1 space-y-8">
@@ -387,7 +387,7 @@ const NewAdmission = () => {
               </div>
 
               {/* Right Column: Fee Structure */}
-              <div className="w-full lg:w-96 shrink-0 space-y-6">
+              <div className="w-full md:w-96 shrink-0 space-y-6">
                 <SectionHeader title="FEE STRUCTURE" />
                 <div className="bg-gray-50 rounded-3xl p-6 border-2 border-gray-100 shadow-inner">
                   <div className="space-y-4">
@@ -553,7 +553,7 @@ const NewAdmission = () => {
         {/* Step 4: Payment Options */}
         {currentStep === 4 && (
           <div className="animate-in fade-in slide-in-from-right-8 duration-700">
-            <div className="flex flex-col lg:flex-row gap-8 items-start">
+            <div className="flex flex-col md:flex-row gap-8 items-start">
               
               {/* Left Column: Payment Methods */}
               <div className="flex-1 space-y-4">
@@ -600,10 +600,10 @@ const NewAdmission = () => {
               </div>
 
               {/* Right Column: Signature */}
-              <div className="w-full lg:w-96 shrink-0 space-y-4">
+              <div className="w-full md:w-96 shrink-0 space-y-4">
                 <SectionHeader title="CANDIDATE SIGNATURE" />
                 <div className="flex flex-col items-center">
-                  <div className="w-full aspect-[2/1] border-4 border-dashed border-gray-100 bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-4 text-center group relative cursor-pointer hover:border-[#8B8B00] hover:bg-[#8B8B00]/5 transition-all shadow-inner overflow-hidden">
+                  <div className="w-full aspect-2/1 border-4 border-dashed border-gray-100 bg-gray-50 rounded-2xl flex flex-col items-center justify-center p-4 text-center group relative cursor-pointer hover:border-[#8B8B00] hover:bg-[#8B8B00]/5 transition-all shadow-inner overflow-hidden">
                     {signaturePreview ? (
                       <div className="relative w-full h-full flex items-center justify-center">
                         <img src={signaturePreview} alt="Signature" className="max-h-full max-w-full object-contain mix-blend-multiply" />
@@ -637,12 +637,12 @@ const NewAdmission = () => {
         )}
 
         {/* Footer Navigation */}
-        <div className="pt-8 border-t-2 border-gray-50 flex justify-between items-center">
+        <div className="pt-8 border-t-2 border-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
           {currentStep > 1 ? (
              <button 
                 type="button" 
                 onClick={() => setCurrentStep(prev => prev - 1)}
-                className="group flex items-center gap-3 border-2 border-gray-100 text-gray-400 px-8 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-[0.25em] hover:bg-gray-50 transition-all active:scale-95"
+                className="group w-full md:w-auto flex items-center gap-3 border-2 border-gray-100 text-gray-400 px-8 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-[0.25em] hover:bg-gray-50 transition-all active:scale-95"
              >
                 <ArrowLeft size={16} className="group-hover:-translate-x-2 transition-transform" />
                 Previous Step
@@ -652,7 +652,7 @@ const NewAdmission = () => {
           <button 
             type="button"
             onClick={() => currentStep === 4 ? handleSubmit() : setCurrentStep(prev => prev + 1)}
-            className="group flex items-center gap-3 bg-[#8B8B00] text-white px-10 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-[0.25em] hover:bg-[#7a7a00] transition-all shadow-xl shadow-yellow-900/20 hover:-translate-y-1 active:scale-95"
+            className="group w-full md:w-auto flex items-center gap-3 bg-[#8B8B00] text-white px-10 py-3.5 rounded-xl font-black uppercase text-[10px] tracking-[0.25em] hover:bg-[#7a7a00] transition-all shadow-xl shadow-yellow-900/20 hover:-translate-y-1 active:scale-95"
           >
             {currentStep === 4 ? 'Pay & Register' : 'Proceed to Next Step'}
             <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
