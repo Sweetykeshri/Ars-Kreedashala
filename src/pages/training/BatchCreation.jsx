@@ -1,401 +1,627 @@
 import React, { useMemo, useState } from 'react';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit2, 
-  Trash2, 
-  Users, 
-  Clock, 
-  Calendar,
-  LayoutGrid,
-  User,
-  Activity,
-  Trophy,
-  X
-} from 'lucide-react';
+import { Check, ChevronDown, Filter, LayoutGrid, Plus, Search, ShieldCheck, Users, X } from 'lucide-react';
+
+const studentRoster = [
+  { id: 'ARS001', name: 'Arjun Mehra', sport: 'Cricket', level: 'U-14' },
+  { id: 'ARS002', name: 'Sana Khan', sport: 'Badminton', level: 'U-12' },
+  { id: 'ARS003', name: 'Kabir Singh', sport: 'Football', level: 'U-15' },
+  { id: 'ARS004', name: 'Riya Verma', sport: 'Tennis', level: 'U-13' },
+  { id: 'ARS005', name: 'Aman Patel', sport: 'Cricket', level: 'U-16' },
+  { id: 'ARS006', name: 'Diya Sharma', sport: 'Football', level: 'U-11' },
+  { id: 'ARS007', name: 'Neha Joshi', sport: 'Badminton', level: 'U-14' },
+  { id: 'ARS008', name: 'Yuvraj Singh', sport: 'Cricket', level: 'U-18' },
+];
+
+const coachRoster = [
+  { id: 'CH101', name: 'Rajesh Kumar', sport: 'Cricket', experience: '10 yrs' },
+  { id: 'CH102', name: 'Amit Singh', sport: 'Football', experience: '8 yrs' },
+  { id: 'CH103', name: 'Sania Mirza', sport: 'Tennis', experience: '12 yrs' },
+  { id: 'CH104', name: 'Pullela Gopichand', sport: 'Badminton', experience: '15 yrs' },
+  { id: 'CH105', name: 'Meera Iyer', sport: 'Multi-Sport', experience: '9 yrs' },
+];
+
+const initialBatches = [
+  { id: 'B-001', name: 'Elite Cricket Morning', sport: 'Cricket', coachName: 'Rajesh Kumar', totalStudents: 18, batchTime: '06:00 AM - 08:00 AM', groundCourt: 'Cricket Ground A', status: 'Active' },
+  { id: 'B-002', name: 'Junior Football Evening', sport: 'Football', coachName: 'Amit Singh', totalStudents: 22, batchTime: '04:00 PM - 06:00 PM', groundCourt: 'Football Turf', status: 'Upcoming' },
+];
 
 const BatchCreation = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [batchName, setBatchName] = useState('');
+  const [sport, setSport] = useState('Cricket');
+  const [batchTime, setBatchTime] = useState('06:00 AM - 08:00 AM');
+  const [groundCourt, setGroundCourt] = useState('');
+  const [studentSearch, setStudentSearch] = useState('');
+  const [coachSearch, setCoachSearch] = useState('');
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [selectedCoach, setSelectedCoach] = useState('');
+  const [confirmedStudents, setConfirmedStudents] = useState([]);
+  const [confirmedCoach, setConfirmedCoach] = useState('');
+  const [coachSelectionOpen, setCoachSelectionOpen] = useState(true);
+  const [studentSelectionOpen, setStudentSelectionOpen] = useState(true);
+  const [createdBatches, setCreatedBatches] = useState(initialBatches);
 
-  const stats = [
-    { title: 'Active Batches', value: '24', icon: <LayoutGrid className="text-blue-600" />, trend: '+3 this month' },
-    { title: 'Total Students', value: '456', icon: <Users className="text-emerald-600" />, trend: 'Avg 19/batch' },
-    { title: 'Capacity Load', value: '82%', icon: <Activity className="text-orange-600" />, trend: 'High demand' },
-    { title: 'Top Sport', value: 'Cricket', icon: <Trophy className="text-purple-600" />, trend: '12 active units' },
-  ];
+  const filteredStudents = useMemo(() => {
+    const query = studentSearch.trim().toLowerCase();
+    if (!query) return studentRoster;
+    return studentRoster.filter((student) => [student.id, student.name, student.sport, student.level].some((field) => field.toLowerCase().includes(query)));
+  }, [studentSearch]);
 
-  const batches = [
-    { id: 'B-001', name: 'Elite Cricket Morning', sport: 'Cricket', ageGroup: 'U-16', capacity: '20', students: '18', timing: '06:00 AM - 08:00 AM', coach: 'Rajesh Kumar', startDate: '2026-01-15', status: 'Active' },
-    { id: 'B-002', name: 'Junior Football Eve', sport: 'Football', ageGroup: 'U-12', capacity: '25', students: '22', timing: '04:00 PM - 06:00 PM', coach: 'Amit Singh', startDate: '2026-02-01', status: 'Active' },
-    { id: 'B-003', name: 'Advanced Tennis Uni', sport: 'Tennis', ageGroup: 'U-19', capacity: '10', students: '10', timing: '07:00 AM - 09:00 AM', coach: 'Sania Mirza', startDate: '2026-01-10', status: 'Full' },
-    { id: 'B-004', name: 'B-Badminton Weekend', sport: 'Badminton', ageGroup: 'U-14', capacity: '15', students: '8', timing: '09:00 AM - 11:00 AM', coach: 'Pullela Gopichand', startDate: '2026-03-01', status: 'Upcoming' },
-  ];
+  const filteredCoaches = useMemo(() => {
+    const query = coachSearch.trim().toLowerCase();
+    if (!query) return coachRoster;
+    return coachRoster.filter((coach) => [coach.id, coach.name, coach.sport, coach.experience].some((field) => field.toLowerCase().includes(query)));
+  }, [coachSearch]);
 
-  const filteredBatches = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
+  const activeCoachId = selectedCoach || confirmedCoach;
+  const selectedStudentRecords = studentRoster.filter((student) => confirmedStudents.includes(student.id));
+  const selectedCoachRecord = coachRoster.find((coach) => coach.id === activeCoachId);
+  const stagedStudentRecords = studentRoster.filter((student) => selectedStudents.includes(student.id));
+  const stagedCoachRecord = coachRoster.find((coach) => coach.id === selectedCoach);
 
-    if (!query) {
-      return batches;
+  const stats = useMemo(() => ([
+    { title: 'Created Batches', value: String(createdBatches.length), note: 'Live list' },
+    { title: 'Selected Students', value: String(selectedStudents.length), note: 'Multi-select' },
+    { title: 'Selected Coach', value: selectedCoach ? '1' : '0', note: 'Single select' },
+    { title: 'Available Coaches', value: String(coachRoster.length), note: 'Roster' },
+  ]), [createdBatches.length, selectedStudents.length, selectedCoach]);
+
+  const toggleStudent = (studentId) => {
+    setSelectedStudents((current) => (current.includes(studentId) ? current.filter((id) => id !== studentId) : [...current, studentId]));
+  };
+
+  const confirmSelection = () => {
+    if (selectedStudents.length === 0) {
+      alert('Please select at least one student before confirming.');
+      return;
     }
 
-    return batches.filter((batch) => (
-      [batch.id, batch.name, batch.sport, batch.ageGroup, batch.coach]
-        .some((field) => field.toLowerCase().includes(query))
-    ));
-  }, [searchTerm, batches]);
+    // commit the currently staged students but keep the selection panel open
+    setConfirmedStudents(selectedStudents);
+  };
 
-  const BatchForm = ({ onClear, onSubmit }) => (
-    <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Batch Name</label>
-        <input type="text" placeholder="Elite Cricket Morning" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Batch Code</label>
-        <input type="text" placeholder="B-005" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Sport</label>
-        <select className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm">
-          <option>Select Sport</option>
-          <option>Cricket</option>
-          <option>Football</option>
-          <option>Tennis</option>
-          <option>Badminton</option>
-        </select>
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Age Group</label>
-        <select className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm">
-          <option>Under 12</option>
-          <option>Under 15</option>
-          <option>Under 18</option>
-          <option>Elite/Open</option>
-        </select>
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Start Date</label>
-        <input type="date" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Training Days</label>
-        <input type="text" placeholder="Mon, Wed, Fri" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Start Time</label>
-        <input type="time" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">End Time</label>
-        <input type="time" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Head Coach</label>
-        <input type="text" placeholder="Coach Name" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Ground / Court</label>
-        <input type="text" placeholder="Ground A" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Maximum Students</label>
-        <input type="number" placeholder="20" className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm" />
-      </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Batch Status</label>
-        <select className="w-full px-4 py-3 bg-[#f7f6f0] border border-[#e7e2cf] rounded-2xl focus:ring-2 focus:ring-[#8b8b00]/15 focus:border-[#8b8b00] transition-all font-medium text-sm">
-          <option>Active</option>
-          <option>Upcoming</option>
-          <option>Full</option>
-          <option>Inactive</option>
-        </select>
-      </div>
-      <div className="lg:col-span-3 flex flex-col sm:flex-row gap-3 sm:justify-end">
-        <button type="button" onClick={onClear} className="px-6 py-3 rounded-2xl border border-[#e7e2cf] font-bold text-gray-500 uppercase tracking-widest text-[11px] hover:bg-[#f7f6f0] transition-all">
-          Clear Form
-        </button>
-        <button type="button" onClick={onSubmit} className="px-6 py-3 rounded-2xl bg-[#8b8b00] text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-[#7a7a00] shadow-xl shadow-[#8b8b00]/20 transition-all">
-          Create Batch
-        </button>
-      </div>
-    </form>
-  );
+  const cancelSelection = () => {
+    setSelectedStudents(confirmedStudents);
+    setStudentSelectionOpen(false);
+  };
+
+  const confirmCoachSelection = () => {
+    if (!selectedCoach) {
+      alert('Please select a coach before confirming.');
+      return;
+    }
+
+    setConfirmedCoach(selectedCoach);
+    setCoachSelectionOpen(false);
+  };
+
+  const cancelCoachSelection = () => {
+    setSelectedCoach(confirmedCoach);
+    setCoachSelectionOpen(false);
+  };
+
+  const createBatch = () => {
+    if (!batchName.trim()) {
+      alert('Please enter a batch name.');
+      return;
+    }
+
+    if (confirmedStudents.length === 0) {
+      alert('Please confirm at least one student.');
+      return;
+    }
+
+    if (!activeCoachId) {
+      alert('Please select a coach.');
+      return;
+    }
+
+    const newBatch = {
+      id: `B-${String(createdBatches.length + 1).padStart(3, '0')}`,
+      name: batchName.trim(),
+      sport,
+      coachName: selectedCoachRecord?.name || 'Coach Assigned',
+      totalStudents: selectedStudentRecords.length,
+      batchTime,
+      groundCourt: groundCourt.trim() || 'Assigned Ground/Court',
+      status: 'Active',
+    };
+
+    setCreatedBatches((current) => [newBatch, ...current]);
+    setBatchName('');
+    setSport('Cricket');
+    setBatchTime('06:00 AM - 08:00 AM');
+    setGroundCourt('');
+    setSelectedStudents([]);
+    setSelectedCoach('');
+    setConfirmedStudents([]);
+    setConfirmedCoach('');
+    setStudentSelectionOpen(true);
+    setStudentSearch('');
+    setCoachSearch('');
+    alert(`Created ${newBatch.name} with ${newBatch.totalStudents} students and 1 coach.`);
+  };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 md:p-6 space-y-8 pb-10">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 space-y-8 pb-10">
+      <div className="flex flex-col gap-4 rounded-4xl border border-gray-100 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between md:p-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Batch Deployment & Management</h2>
-          <p className="text-gray-500 text-sm mt-1">Organize and monitor training units across the academy.</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8B8B00]">Batch & Training</p>
+          <h2 className="mt-2 text-2xl font-black text-gray-900 uppercase tracking-tight">Batch Creation</h2>
+          <p className="mt-1 text-sm text-gray-500">Create a new batch by choosing students, one coach, and the training details inside the dashboard.</p>
         </div>
-        <button 
+        <button
           type="button"
-          onClick={() => setIsFormOpen(true)}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-200"
+          onClick={() => setShowForm((current) => !current)}
+          className="inline-flex items-center gap-2 rounded-2xl bg-[#8B8B00] px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-[#8B8B00]/20 transition-all hover:bg-[#767600]"
         >
-          <Plus size={20} />
-          <span>Deploy New Batch</span>
+          <Plus size={14} />
+          Deploy New Batch
         </button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm hover-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gray-50 rounded-2xl">{stat.icon}</div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{stat.trend}</span>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.title} className="rounded-4xl border border-gray-100 bg-white p-5 shadow-sm">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400">{stat.title}</p>
+            <div className="mt-3 flex items-end justify-between gap-3">
+              <h3 className="text-3xl font-black text-gray-900 leading-none">{stat.value}</h3>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{stat.note}</p>
             </div>
-            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">{stat.title}</h3>
-            <p className="text-2xl font-black text-gray-900 mt-1">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Filters & Search */}
-      <div className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 flex-1">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search by ID, batch name or coach..." 
-              className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/10 text-sm font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      {showForm && (
+        <div className="space-y-6 rounded-4xl border border-gray-100 bg-white p-5 shadow-sm md:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600">Inline Batch Form</p>
+              <h3 className="mt-2 text-xl font-black text-gray-900 uppercase tracking-tight">Deploy New Batch</h3>
+              <p className="mt-1 text-sm text-gray-500">This stays inside the dashboard shell with no popup or background blur.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="inline-flex items-center gap-2 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-gray-600 transition-all hover:bg-gray-100"
+              >
+                <X size={14} />
+                Hide Form
+              </button>
+              <button
+                type="button"
+                onClick={createBatch}
+                className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700"
+              >
+                Create Batch
+              </button>
+            </div>
           </div>
-          <button className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm font-semibold">
-            <Filter size={18} />
-            <span>Advanced Filters</span>
-          </button>
-        </div>
-        <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
-          <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-          <span>Showing 24 Active Units</span>
-        </div>
-      </div>
 
-      {/* Batch Table/List */}
-      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50/50 border-b border-gray-100">
-                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Batch Identity</th>
-                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Deployment Details</th>
-                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Commanding Officer</th>
-                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Personnel Load</th>
-                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Operational Status</th>
-                <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {filteredBatches.map((batch) => (
-                <tr key={batch.id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xs ring-4 ring-blue-50/50 group-hover:scale-110 transition-transform">
-                        {batch.sport.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-gray-900 leading-none">{batch.name}</p>
-                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">{batch.id} • {batch.ageGroup}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-gray-600">
-                        <Clock size={14} className="text-gray-400" />
-                        <span>{batch.timing}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-                        <Calendar size={12} />
-                        <span>Starts: {batch.startDate}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                            <User size={12} className="text-gray-400" />
-                        </div>
-                        <span className="text-sm font-semibold text-gray-700">{batch.coach}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex flex-col gap-1.5 w-32">
-                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-tight">
-                            <span className="text-gray-400">Load</span>
-                            <span className="text-gray-900">{batch.students}/{batch.capacity}</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div 
-                                className={`h-full transition-all duration-1000 ${parseInt(batch.students) >= parseInt(batch.capacity) ? 'bg-orange-500' : 'bg-blue-600'}`} 
-                                style={{ width: `${(parseInt(batch.students) / parseInt(batch.capacity)) * 100}%` }}
-                            ></div>
-                        </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      batch.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                      batch.status === 'Full' ? 'bg-orange-50 text-orange-600 border border-orange-100' :
-                      'bg-blue-50 text-blue-600 border border-blue-100'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        batch.status === 'Active' ? 'bg-emerald-500 animate-pulse' :
-                        batch.status === 'Full' ? 'bg-orange-500' :
-                        'bg-blue-500'
-                      }`}></span>
-                      {batch.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
-                        onClick={() => alert(`Configuring modifications for batch: ${batch.id}`)}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" 
-                        title="Edit"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button 
-                        onClick={() => {
-                          if(confirm(`Security Alert: Are you sure you want to decommission batch ${batch.id}?`)) {
-                            alert(`Batch ${batch.id} has been decommissioned.`);
-                          }
-                        }}
-                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" 
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredBatches.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="px-8 py-10 text-center text-gray-500 font-medium">
-                    No batches match the current search.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="md:hidden p-4 space-y-4">
-          {filteredBatches.map((batch) => (
-            <article key={batch.id} className="rounded-3xl border border-gray-100 bg-gray-50/60 p-4 space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{batch.id} • {batch.ageGroup}</p>
-                  <h3 className="mt-1 text-base font-bold text-gray-900 leading-tight whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{batch.name}</h3>
-                  <p className="mt-1 text-xs font-semibold text-gray-600">{batch.sport} • {batch.coach}</p>
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <div className="space-y-5 rounded-4xl border border-gray-100 bg-gray-50/50 p-4 md:p-5">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Batch Name</label>
+                  <input
+                    value={batchName}
+                    onChange={(e) => setBatchName(e.target.value)}
+                    type="text"
+                    placeholder="Elite Cricket Morning"
+                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#8B8B00] focus:ring-4 focus:ring-[#8B8B00]/10"
+                  />
                 </div>
-                <span className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                  batch.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                  batch.status === 'Full' ? 'bg-orange-50 text-orange-600 border-orange-100' :
-                  'bg-blue-50 text-blue-600 border-blue-100'
-                }`}>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Sport</label>
+                  <select
+                    value={sport}
+                    onChange={(e) => setSport(e.target.value)}
+                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition-all focus:border-[#8B8B00] focus:ring-4 focus:ring-[#8B8B00]/10"
+                  >
+                    <option>Cricket</option>
+                    <option>Football</option>
+                    <option>Tennis</option>
+                    <option>Badminton</option>
+                    <option>Athletics</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Batch Time</label>
+                  <input
+                    value={batchTime}
+                    onChange={(e) => setBatchTime(e.target.value)}
+                    type="text"
+                    placeholder="06:00 AM - 08:00 AM"
+                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#8B8B00] focus:ring-4 focus:ring-[#8B8B00]/10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500">Ground/Court</label>
+                  <input
+                    value={groundCourt}
+                    onChange={(e) => setGroundCourt(e.target.value)}
+                    type="text"
+                    placeholder="Ground A / Court 2"
+                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-[#8B8B00] focus:ring-4 focus:ring-[#8B8B00]/10"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 rounded-4xl bg-linear-to-br from-[#8B8B00]/5 to-amber-50 p-4 sm:grid-cols-3">
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Batch Name</p>
+                  <p className="mt-2 text-sm font-bold text-gray-900 wrap-break-word">{batchName || 'Not selected yet'}</p>
+                </div>
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sport</p>
+                  <p className="mt-2 text-sm font-bold text-gray-900">{sport}</p>
+                </div>
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Batch Time</p>
+                  <p className="mt-2 text-sm font-bold text-gray-900">{batchTime}</p>
+                </div>
+                <div className="rounded-2xl bg-white/90 p-4 shadow-sm sm:col-span-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Confirmed Students</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {selectedStudentRecords.length > 0 ? selectedStudentRecords.map((student) => (
+                      <span key={student.id} className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                        <Check size={12} /> {student.name}
+                      </span>
+                    )) : (
+                      <p className="text-sm font-medium text-gray-400">No students confirmed yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <aside className="space-y-4 rounded-4xl border border-gray-100 bg-white p-4 md:p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8B8B00]">Selection Summary</p>
+                  <h4 className="mt-1 text-lg font-black uppercase text-gray-900">Ready to deploy</h4>
+                </div>
+                <LayoutGrid className="text-[#8B8B00]" size={24} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-gray-50 p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Students</p>
+                  <p className="mt-1 text-2xl font-black text-gray-900">{confirmedStudents.length}</p>
+                </div>
+                <div className="rounded-2xl bg-gray-50 p-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coach</p>
+                  <p className="mt-1 text-2xl font-black text-gray-900">{confirmedCoach ? 1 : 0}</p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-[#8B8B00]/10 bg-[#8B8B00]/5 p-4 text-sm text-gray-600">
+                Select multiple students and one coach from the lists below, then click Done to fill the form before creating the batch.
+              </div>
+              <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+                <div className="flex items-center gap-3">
+                  <ShieldCheck className="text-emerald-600" size={20} />
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Responsive Layout</p>
+                    <p className="text-sm font-black uppercase text-gray-900">Mobile, tablet, desktop</p>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <section className="rounded-4xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between gap-4 border-b border-gray-50 bg-gray-50/60 px-5 py-4 md:px-6">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600">Students</p>
+                  <h4 className="mt-1 text-lg font-black uppercase tracking-tight text-gray-900">Select Students</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStudentSelectionOpen((current) => !current)}
+                  className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-black uppercase tracking-widest text-blue-700 transition-all hover:bg-blue-100"
+                >
+                  {studentSelectionOpen ? 'Close Selection' : 'Select Students'}
+                </button>
+              </div>
+              {studentSelectionOpen ? (
+                <>
+                  <div className="p-4 md:p-6">
+                    <div className="relative mb-4 w-full">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                      <input
+                        type="text"
+                        value={studentSearch}
+                        onChange={(e) => setStudentSearch(e.target.value)}
+                        placeholder="Search students"
+                        className="w-full rounded-2xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      />
+                    </div>
+                    <div className="max-h-105 overflow-auto">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {filteredStudents.map((student) => {
+                          const checked = selectedStudents.includes(student.id);
+
+                          return (
+                            <label
+                              key={student.id}
+                              className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-all ${checked ? 'border-blue-200 bg-blue-50/50 shadow-sm' : 'border-gray-100 bg-gray-50/40 hover:border-gray-200 hover:bg-gray-50'}`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => toggleStudent(student.id)}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between gap-3">
+                                  <p className="truncate text-sm font-bold text-gray-900">{student.name}</p>
+                                  <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm">{student.level}</span>
+                                </div>
+                                <p className="mt-1 text-xs font-semibold text-gray-500">{student.id} • {student.sport}</p>
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 border-t border-gray-100 p-4 md:flex-row md:items-center md:justify-end md:p-5">
+                    <button
+                      type="button"
+                      onClick={cancelSelection}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-600 transition-all hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={confirmSelection}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs font-black uppercase tracking-widest text-blue-700 transition-all hover:bg-blue-100"
+                    >
+                      Done / Confirm Selection
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="p-4 md:p-6">
+                  <div className="rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Students confirmed</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {selectedStudentRecords.length > 0 ? selectedStudentRecords.map((student) => (
+                        <span key={student.id} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-700 shadow-sm">
+                          <Check size={12} /> {student.name}
+                        </span>
+                      )) : (
+                        <p className="text-sm font-medium text-gray-500">No students confirmed yet</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            <section className="rounded-4xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between gap-4 border-b border-gray-50 bg-gray-50/60 px-5 py-4 md:px-6">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-600">Coach</p>
+                  <h4 className="mt-1 text-lg font-black uppercase tracking-tight text-gray-900">Select Coach</h4>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative w-full max-w-xs">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                      type="text"
+                      value={coachSearch}
+                      onChange={(e) => setCoachSearch(e.target.value)}
+                      placeholder="Search coaches"
+                      className="w-full rounded-2xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCoachSelectionOpen((current) => !current)}
+                    className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-black uppercase tracking-widest text-emerald-700 transition-all hover:bg-emerald-100"
+                  >
+                    {coachSelectionOpen ? 'Close Selection' : 'Select Coach'}
+                  </button>
+                </div>
+              </div>
+              <div className="max-h-105 overflow-auto p-4 md:p-6">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {filteredCoaches.map((coach) => {
+                    const checked = selectedCoach === coach.id;
+
+                    return (
+                      <label
+                        key={coach.id}
+                        className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-all ${checked ? 'border-emerald-200 bg-emerald-50/60 shadow-sm' : 'border-gray-100 bg-gray-50/40 hover:border-gray-200 hover:bg-gray-50'}`}
+                      >
+                        <input
+                          type="radio"
+                          name="coach-selection"
+                          checked={checked}
+                          onChange={() => setSelectedCoach(coach.id)}
+                          className="mt-1 h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="truncate text-sm font-bold text-gray-900">{coach.name}</p>
+                            <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm">{coach.experience}</span>
+                          </div>
+                          <p className="mt-1 text-xs font-semibold text-gray-500">{coach.id} • {coach.sport}</p>
+                          <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">{checked ? 'Selected' : 'Tap to select'}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {coachSelectionOpen ? (
+                <div className="flex flex-col gap-3 border-t border-gray-100 p-4 md:flex-row md:items-center md:justify-end md:p-5">
+                  <button
+                    type="button"
+                    onClick={cancelCoachSelection}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-xs font-black uppercase tracking-widest text-gray-600 transition-all hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmCoachSelection}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-black uppercase tracking-widest text-emerald-700 transition-all hover:bg-emerald-100"
+                  >
+                    Done / Confirm Selection
+                  </button>
+                </div>
+              ) : (
+                <div className="p-4 md:p-6">
+                  <div className="rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Coach confirmed</p>
+                    <div className="mt-3">
+                      {selectedCoachRecord ? (
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm">
+                          <Check size={12} /> {selectedCoachRecord.name}
+                        </div>
+                      ) : (
+                        <p className="text-sm font-medium text-gray-500">No coach confirmed yet</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </section>
+          </div>
+        </div>
+      )}
+
+      <section className="space-y-5 rounded-4xl border border-gray-100 bg-white p-5 shadow-sm md:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8B8B00]">Created Batches</p>
+            <h3 className="mt-2 text-xl font-black text-gray-900 uppercase tracking-tight">Batch List</h3>
+          </div>
+          <div className="flex items-center gap-2 rounded-2xl bg-gray-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
+            <Filter size={12} className="text-[#8B8B00]" />
+            Showing {createdBatches.length} batches
+          </div>
+        </div>
+
+        <div className="hidden overflow-hidden rounded-3xl border border-gray-100 md:block">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left">
+              <thead>
+                <tr className="bg-gray-50/80">
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Batch Name</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Sport</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Coach Name</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Total Students</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Batch Time</th>
+                  <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {createdBatches.map((batch) => (
+                  <tr key={batch.id} className="transition-colors hover:bg-gray-50/60">
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-bold text-gray-900">{batch.name}</p>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-700">{batch.sport}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-700 wrap-break-word">{batch.coachName}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-gray-900">{batch.totalStudents}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-700">{batch.batchTime}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${batch.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${batch.status === 'Active' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
+                        {batch.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:hidden">
+          {createdBatches.map((batch) => (
+            <article key={batch.id} className="rounded-3xl border border-gray-100 bg-gray-50/60 p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{batch.id}</p>
+                  <h4 className="mt-1 text-base font-bold text-gray-900">{batch.name}</h4>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${batch.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
                   {batch.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div className="rounded-2xl bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Timing</p>
-                  <p className="mt-1 font-semibold text-gray-900">{batch.timing}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sport</p>
+                  <p className="mt-1 font-semibold text-gray-900">{batch.sport}</p>
                 </div>
                 <div className="rounded-2xl bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coach</p>
-                  <p className="mt-1 font-semibold text-gray-900 whitespace-normal" style={{ overflowWrap: 'anywhere' }}>{batch.coach}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Students</p>
+                  <p className="mt-1 font-semibold text-gray-900">{batch.totalStudents}</p>
                 </div>
-                <div className="rounded-2xl bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Load</p>
-                  <div className="mt-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-tight text-gray-400">
-                    <span>Students</span>
-                    <span className="text-gray-900">{batch.students}/{batch.capacity}</span>
-                  </div>
-                  <div className="mt-2 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-1000 ${parseInt(batch.students) >= parseInt(batch.capacity) ? 'bg-orange-500' : 'bg-blue-600'}`}
-                      style={{ width: `${(parseInt(batch.students) / parseInt(batch.capacity)) * 100}%` }}
-                    />
-                  </div>
+                <div className="rounded-2xl bg-white p-3 col-span-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coach Name</p>
+                  <p className="mt-1 font-semibold text-gray-900 wrap-break-word">{batch.coachName}</p>
                 </div>
-                <div className="rounded-2xl bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Start Date</p>
-                  <p className="mt-1 font-semibold text-gray-900">{batch.startDate}</p>
+                <div className="rounded-2xl bg-white p-3 col-span-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Batch Time</p>
+                  <p className="mt-1 font-semibold text-gray-900">{batch.batchTime}</p>
                 </div>
-              </div>
-
-              <div className="flex gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => alert(`Configuring modifications for batch: ${batch.id}`)}
-                  className="flex-1 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm(`Security Alert: Are you sure you want to decommission batch ${batch.id}?`)) {
-                      alert(`Batch ${batch.id} has been decommissioned.`);
-                    }
-                  }}
-                  className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-rose-600"
-                >
-                  Delete
-                </button>
               </div>
             </article>
           ))}
-
-          {filteredBatches.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm font-medium text-gray-500">
-              No batches match the current search.
-            </div>
-          )}
         </div>
-      </div>
+      </section>
 
-      {/* Optional Form Modal (Mock) */}
-      {isFormOpen && (
-        <div className="fixed inset-0 z-60 flex items-start justify-center p-4 bg-gray-900/40 backdrop-blur-md overflow-y-auto">
-          <div className="bg-white w-full max-w-4xl rounded-4xl shadow-2xl overflow-hidden animate-fadeIn my-6">
-            <div className="p-6 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">Deploy New Batch</h3>
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Batch creation & deployment</p>
-              </div>
-              <button 
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-xl text-gray-400"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-6">
-              <BatchForm
-                onClear={() => alert('Form cleared.')}
-                onSubmit={() => {
-                  alert('New batch deployed successfully.');
-                  setIsFormOpen(false);
-                }}
-              />
+      <section className="rounded-4xl border border-dashed border-gray-200 bg-gray-50/60 p-5 text-sm text-gray-600 md:p-6">
+        <div className="flex items-center gap-3">
+          <ChevronDown className="text-[#8B8B00]" size={18} />
+          <p className="font-medium">Selected students: {selectedStudentRecords.length || 'none'} | Selected coach: {selectedCoachRecord ? selectedCoachRecord.name : 'none'}</p>
+        </div>
+        {(stagedStudentRecords.length > 0 || stagedCoachRecord) && (
+          <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Pending Selection</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {stagedStudentRecords.map((student) => (
+                <span key={student.id} className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                  <Check size={12} /> {student.name}
+                </span>
+              ))}
+              {stagedCoachRecord && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                  <Check size={12} /> {stagedCoachRecord.name}
+                </span>
+              )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+        {selectedStudentRecords.length > 0 && (
+          <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Confirmed Students</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {selectedStudentRecords.map((student) => (
+                <span key={student.id} className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                  <Check size={12} /> {student.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+
+      <div className="mt-2 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">
+        <Users size={14} />
+        <span>Responsive layout for mobile, tablet, and desktop</span>
+      </div>
     </div>
   );
 };

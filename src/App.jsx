@@ -23,6 +23,7 @@ import GroundAllocation from './pages/training/GroundAllocation';
 // Coach Management
 import TotalCoach from './pages/coach/TotalCoach';
 import CoachProfiles from './pages/coach/CoachProfiles';
+import CoachDetails from './pages/coach/CoachDetails';
 import AssignedBatches from './pages/coach/AssignedBatches';
 import CoachRegistration from './pages/coach/CoachRegistration';
 
@@ -73,6 +74,7 @@ function App() {
             <Route index element={<Navigate to="/coach/total" replace />} />
             <Route path="total" element={<TotalCoach />} />
             <Route path="profiles" element={<CoachProfiles />} />
+            <Route path="profiles/:coachId" element={<CoachDetails />} />
             <Route path="registration" element={<CoachRegistration />} />
             <Route path="attendance" element={<Navigate to="/attendance/coaches" replace />} />
             <Route path="assigned-batches" element={<AssignedBatches />} />

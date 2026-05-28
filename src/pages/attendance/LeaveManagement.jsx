@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   FileText, 
   Calendar, 
@@ -16,7 +16,7 @@ import {
 const LeaveManagement = () => {
   const [activeTab, setActiveTab] = useState('requests');
 
-  const leaveRequests = [
+  const [leaveRequests, setLeaveRequests] = useState([
     { 
       id: 'LR001', 
       user: 'Arjun Sharma', 
@@ -47,7 +47,49 @@ const LeaveManagement = () => {
       status: 'Rejected',
       attachment: null
     },
-  ];
+  ]);
+
+  const [leaveType, setLeaveType] = useState('Sick Leave');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [reason, setReason] = useState('');
+
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const handleFileClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    // enforce ~5MB limit
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('File too large. Maximum allowed size is 5MB.');
+      e.target.value = '';
+      return;
+    }
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(file);
+    // create preview for images
+    if (file.type.startsWith('image/')) {
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPreviewUrl(null);
+    }
+  };
+
+  const removeFile = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -71,7 +113,24 @@ const LeaveManagement = () => {
           <form 
             onSubmit={(e) => {
               e.preventDefault();
-              alert('Leave application submitted to the Command Center. You will be notified of the decision via the priority relay.');
+              const newRequest = {
+                id: `LR${Date.now()}`,
+                user: 'You',
+                role: 'Student',
+                type: leaveType,
+                date: startDate && endDate ? `${startDate} - ${endDate}` : (startDate || endDate || ''),
+                reason: reason || '-',
+                status: 'Pending',
+                attachment: selectedFile ? selectedFile.name : null,
+              };
+              setLeaveRequests((prev) => [newRequest, ...prev]);
+              alert('Leave application submitted.');
+              // reset form
+              setLeaveType('Sick Leave');
+              setStartDate('');
+              setEndDate('');
+              setReason('');
+              removeFile();
             }}
             className="space-y-4 text-sm"
           >
@@ -108,9 +167,35 @@ const LeaveManagement = () => {
             <div>
               <label className="block text-gray-700 font-semibold mb-1.5">Supporting Document</label>
               <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center group hover:border-blue-400 transition-all cursor-pointer">
-                <Upload className="mx-auto text-gray-400 group-hover:text-blue-500 mb-2" size={20} />
-                <p className="text-xs text-gray-500 font-medium">Click to upload or drag and drop</p>
-                <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-wider">PDF, PNG, JPG (Max 5MB)</p>
+                <input ref={fileInputRef} type="file" className="hidden" accept="image/*,application/pdf" onChange={handleFileChange} />
+                {!selectedFile && (
+                  <div onClick={handleFileClick} className="cursor-pointer">
+                    <Upload className="mx-auto text-gray-400 group-hover:text-blue-500 mb-2" size={20} />
+                    <p className="text-xs text-gray-500 font-medium">Click to upload or drag and drop</p>
+                    <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-wider">PDF, PNG, JPG (Max 5MB)</p>
+                  </div>
+                )}
+
+                {selectedFile && (
+                  <div className="flex flex-col md:flex-row items-center gap-4">
+                    {previewUrl ? (
+                      <img src={previewUrl} alt="preview" className="w-28 h-20 object-cover rounded-md border" />
+                    ) : (
+                      <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-md border">
+                        <Paperclip size={16} />
+                        <div className="text-left">
+                          <div className="text-sm font-semibold text-gray-700">{selectedFile.name}</div>
+                          <div className="text-[11px] text-gray-500">{(selectedFile.size / 1024).toFixed(0)} KB</div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <button type="button" onClick={handleFileClick} className="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-100">Replace</button>
+                      <button type="button" onClick={removeFile} className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100">Remove</button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -140,7 +225,7 @@ const LeaveManagement = () => {
 
       {/* Right Column: History/Requests */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden min-h-[600px]">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden min-h-150">
           <div className="flex border-b border-gray-100 px-6 pt-6">
             <button 
               onClick={() => setActiveTab('requests')}

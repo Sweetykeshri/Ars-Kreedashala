@@ -25,14 +25,32 @@ const StudentAttendance = () => {
     { label: 'Late Arrival', value: '23', color: 'bg-amber-600', icon: <Clock size={20} className="text-white" /> },
   ];
 
-  const students = [
+  const [students, setStudents] = useState([
     { id: 'STU001', name: 'Arjun Sharma', batch: 'B1 - Cricket', sport: 'Cricket', status: 'Present', time: '04:15 PM', remarks: 'On time' },
     { id: 'STU002', name: 'Suhani Rao', batch: 'B2 - Football', sport: 'Football', status: 'Absent', time: '-', remarks: 'Informed' },
     { id: 'STU003', name: 'Ishaan Gupta', batch: 'B1 - Cricket', sport: 'Cricket', status: 'Late', time: '04:45 PM', remarks: 'Late due to school' },
     { id: 'STU004', name: 'Riya Verma', batch: 'B3 - Badminton', sport: 'Badminton', status: 'Present', time: '07:05 AM', remarks: '' },
     { id: 'STU005', name: 'Kabir Singh', batch: 'B2 - Football', sport: 'Football', status: 'Present', time: '05:10 PM', remarks: '' },
     { id: 'STU006', name: 'Ananya Das', batch: 'B3 - Badminton', sport: 'Badminton', status: 'Present', time: '07:15 AM', remarks: '' },
-  ];
+  ]);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const formatTime = (date) => {
+    const d = date || new Date();
+    let hours = d.getHours();
+    const minutes = d.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const mm = String(minutes).padStart(2, '0');
+    return `${hours}:${mm} ${ampm}`;
+  };
+
+  const markAttendance = () => {
+    const now = new Date();
+    setStudents((curr) => curr.map((s) => ({ ...s, status: 'Present', time: formatTime(now), remarks: s.remarks || 'Marked present' })));
+    setSuccessMessage('Attendance saved — all players marked Present');
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -47,10 +65,10 @@ const StudentAttendance = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Student Attendance</h1>
-          <p className="text-gray-500">Track and manage daily student logs for {selectedDate}</p>
+          <h1 className="text-2xl font-bold text-gray-800">Player Attendance</h1>
+          <p className="text-gray-500">Track and manage daily player logs for {selectedDate}</p>
         </div>
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
@@ -60,10 +78,17 @@ const StudentAttendance = () => {
               className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-            <CheckCircle2 size={18} />
-            <span>Mark All Present</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={markAttendance} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+              <CheckCircle2 size={18} />
+              <span>Mark Attendance</span>
+            </button>
+            {successMessage && (
+              <div className="rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-2 text-sm font-semibold">
+                {successMessage}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

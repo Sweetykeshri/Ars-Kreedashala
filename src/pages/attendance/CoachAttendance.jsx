@@ -16,7 +16,7 @@ import {
 const CoachAttendance = () => {
   const [viewMode, setViewMode] = useState('grid');
   
-  const coaches = [
+  const [coaches, setCoaches] = useState([
     { 
       id: 'CH001', 
       name: 'Rajesh Patil', 
@@ -57,7 +57,39 @@ const CoachAttendance = () => {
       batch: 'Track & Field', 
       ground: 'Main Track' 
     },
-  ];
+  ]);
+
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const formatTime = (date) => {
+    const d = date || new Date();
+    let hours = d.getHours();
+    const minutes = d.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const mm = String(minutes).padStart(2, '0');
+    return `${hours}:${mm} ${ampm}`;
+  };
+
+  const markAttendance = () => {
+    const now = new Date();
+    setCoaches((curr) => curr.map((c) => ({ ...c, status: 'Present', inTime: formatTime(now) })));
+    setSuccessMessage('Coach attendance saved — all marked Present');
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
+  const markCoachPresent = (id) => {
+    const now = new Date();
+    setCoaches((curr) => curr.map((c) => (c.id === id ? { ...c, status: 'Present', inTime: formatTime(now) } : c)));
+    setSuccessMessage('Marked Present');
+    setTimeout(() => setSuccessMessage(''), 2000);
+  };
+
+  const markCoachLeave = (id) => {
+    setCoaches((curr) => curr.map((c) => (c.id === id ? { ...c, status: 'Absent', inTime: '--' } : c)));
+    setSuccessMessage('Marked Leave');
+    setTimeout(() => setSuccessMessage(''), 2000);
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -89,9 +121,9 @@ const CoachAttendance = () => {
               <List size={20} />
             </button>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm">
+          <button onClick={markAttendance} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm">
             <UserPlus size={18} />
-            <span>Proxy Assignment</span>
+            <span>Mark Attendance</span>
           </button>
         </div>
       </div>
@@ -122,6 +154,13 @@ const CoachAttendance = () => {
             className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        {successMessage && (
+          <div className="w-full md:w-auto mt-2 md:mt-0">
+            <div className="rounded-md bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-2 text-sm font-semibold">
+              {successMessage}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Coach Cards Grid */}
@@ -169,10 +208,10 @@ const CoachAttendance = () => {
               </div>
 
               <div className="mt-5 grid grid-cols-2 gap-2">
-                <button className={`flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-bold transition-all ${coach.status === 'Present' ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>
+                <button onClick={() => markCoachPresent(coach.id)} className={`flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-bold transition-all ${coach.status === 'Present' ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>
                   <CheckCircle2 size={14} /> Mark Present
                 </button>
-                <button className="flex items-center justify-center gap-2 py-1.5 bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-500 rounded-lg text-xs font-bold transition-all">
+                <button onClick={() => markCoachLeave(coach.id)} className="flex items-center justify-center gap-2 py-1.5 bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-500 rounded-lg text-xs font-bold transition-all">
                   <XCircle size={14} /> Mark Leave
                 </button>
               </div>

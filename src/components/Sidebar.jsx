@@ -139,7 +139,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
       icon: <Clock size={20} />,
       id: 'attendance',
       submenu: [
-        { title: 'Student Attendance', path: '/attendance/students', icon: <Users size={18} /> },
+        { title: 'Player Attendance', path: '/attendance/students', icon: <Users size={18} /> },
         { title: 'Coach Attendance', path: '/attendance/coaches', icon: <UserCircle size={18} /> },
         { title: 'Leave Management', path: '/attendance/leave', icon: <FileText size={18} /> },
         { title: 'Attendance Reports', path: '/attendance/reports', icon: <TrendingUp size={18} /> },

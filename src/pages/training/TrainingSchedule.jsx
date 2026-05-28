@@ -7,14 +7,26 @@ import {
   ChevronDown
 } from 'lucide-react';
 
+const initialScheduleForm = {
+  id: '',
+  batch: '',
+  sport: 'Cricket',
+  coach: '',
+  days: 'Mon Wed Fri',
+  startTime: '06:00',
+  endTime: '08:00',
+  ground: '',
+  status: 'Active'
+};
+
 const TrainingSchedule = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sportFilter, setSportFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [trainingDayFilter, setTrainingDayFilter] = useState('All');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const schedules = [
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [newSchedule, setNewSchedule] = useState(initialScheduleForm);
+  const [scheduleItems, setScheduleItems] = useState([
     {
       id: 'ARS001',
       batch: 'Elite Cricket Morning',
@@ -55,7 +67,9 @@ const TrainingSchedule = () => {
       ground: 'Court 1',
       status: 'Upcoming'
     }
-  ];
+  ]);
+
+  const schedules = scheduleItems;
 
   const filteredSchedules = useMemo(() => {
     return schedules.filter((item) => {
@@ -76,116 +90,333 @@ const TrainingSchedule = () => {
     return 'bg-orange-50 text-orange-600 border-orange-100';
   };
 
+  const updateNewSchedule = (field, value) => {
+    setNewSchedule((current) => ({ ...current, [field]: value }));
+  };
+
+  const createSchedule = () => {
+    if (!newSchedule.id.trim() || !newSchedule.batch.trim() || !newSchedule.coach.trim() || !newSchedule.ground.trim()) {
+      alert('Please fill Schedule ID, Batch Name, Coach, and Ground before creating the schedule.');
+      return;
+    }
+
+    const nextSchedule = {
+      id: newSchedule.id.trim(),
+      batch: newSchedule.batch.trim(),
+      sport: newSchedule.sport,
+      coach: newSchedule.coach.trim(),
+      days: newSchedule.days,
+      time: `${newSchedule.startTime} - ${newSchedule.endTime}`,
+      ground: newSchedule.ground.trim(),
+      status: newSchedule.status
+    };
+
+    setScheduleItems((current) => [nextSchedule, ...current]);
+    setNewSchedule(initialScheduleForm);
+    setIsCreateFormOpen(false);
+    alert(`Created schedule for ${nextSchedule.batch}.`);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6 space-y-8 pb-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Training Schedule List</h2>
-          <p className="text-gray-500 text-sm mt-1">Manage schedules across all training batches and facilities.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-200"
-          >
-            <Plus size={16} />
-            <span>Create Schedule</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => alert('Exporting schedule list as CSV...')}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest"
-          >
-            <Download size={16} />
-            <span>Export CSV</span>
-          </button>
-        </div>
-      </div>
+      {!isCreateFormOpen && (
+        <>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Training Schedule List</h2>
+              <p className="text-gray-500 text-sm mt-1">Manage schedules across all training batches and facilities.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsCreateFormOpen(true)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all text-xs font-bold uppercase tracking-widest shadow-lg shadow-blue-200"
+              >
+                <Plus size={16} />
+                <span>Create Schedule</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => alert('Exporting schedule list as CSV...')}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-gray-600 hover:bg-gray-50 transition-all text-xs font-bold uppercase tracking-widest"
+              >
+                <Download size={16} />
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
 
-      <div className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm space-y-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-2xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search by Schedule ID, Batch, Coach, or Sport"
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 text-sm font-medium"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-100 rounded-2xl text-gray-600 hover:bg-gray-50 transition-colors text-xs font-bold uppercase tracking-widest">
-            <Filter size={16} />
-            <span>Advanced Filters</span>
-          </button>
-        </div>
+          <div className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm space-y-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-2xl">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search by Schedule ID, Batch, Coach, or Sport"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/10 text-sm font-medium"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <button className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-100 rounded-2xl text-gray-600 hover:bg-gray-50 transition-colors text-xs font-bold uppercase tracking-widest">
+                <Filter size={16} />
+                <span>Advanced Filters</span>
+              </button>
+            </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Sport</label>
-            <select
-              className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
-              value={sportFilter}
-              onChange={(e) => setSportFilter(e.target.value)}
-            >
-              <option>All</option>
-              <option>Cricket</option>
-              <option>Football</option>
-              <option>Fitness</option>
-              <option>Badminton</option>
-            </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Sport</label>
+                <select
+                  className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
+                  value={sportFilter}
+                  onChange={(e) => setSportFilter(e.target.value)}
+                >
+                  <option>All</option>
+                  <option>Cricket</option>
+                  <option>Football</option>
+                  <option>Fitness</option>
+                  <option>Badminton</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Status</label>
+                <select
+                  className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option>All</option>
+                  <option>Active</option>
+                  <option>Upcoming</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                  <option>Postponed</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Training Day</label>
+                <select
+                  className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
+                  value={trainingDayFilter}
+                  onChange={(e) => setTrainingDayFilter(e.target.value)}
+                >
+                  <option>All</option>
+                  <option>Mon</option>
+                  <option>Tue</option>
+                  <option>Wed</option>
+                  <option>Thu</option>
+                  <option>Fri</option>
+                  <option>Sat</option>
+                  <option>Sun</option>
+                </select>
+              </div>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  className="w-full px-4 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSportFilter('All');
+                    setStatusFilter('All');
+                    setTrainingDayFilter('All');
+                  }}
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Status</label>
-            <select
-              className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option>All</option>
-              <option>Active</option>
-              <option>Upcoming</option>
-              <option>Completed</option>
-              <option>Cancelled</option>
-              <option>Postponed</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Filter by Training Day</label>
-            <select
-              className="w-full px-4 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium"
-              value={trainingDayFilter}
-              onChange={(e) => setTrainingDayFilter(e.target.value)}
-            >
-              <option>All</option>
-              <option>Mon</option>
-              <option>Tue</option>
-              <option>Wed</option>
-              <option>Thu</option>
-              <option>Fri</option>
-              <option>Sat</option>
-              <option>Sun</option>
-            </select>
-          </div>
-          <div className="flex items-end">
-            <button
-              type="button"
-              className="w-full px-4 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest"
-              onClick={() => {
-                setSearchTerm('');
-                setSportFilter('All');
-                setStatusFilter('All');
-                setTrainingDayFilter('All');
-              }}
-            >
-              Reset Filters
-            </button>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
-      <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
+      {isCreateFormOpen && (
+        <section className="rounded-4xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+          <div className="border-b border-gray-100 bg-linear-to-r from-blue-50 to-sky-50 px-6 py-5 md:px-7">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600">Inline Schedule Form</p>
+                <h3 className="mt-2 text-2xl font-black text-gray-900">Create Training Schedule</h3>
+                <p className="mt-1 text-sm text-gray-500">This form opens inside the page, keeps the shell visible, and uses a landscape layout on large screens.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateFormOpen(false)}
+                  className="rounded-2xl border border-gray-100 bg-white px-4 py-2.5 text-xs font-black uppercase tracking-widest text-gray-600 transition-all hover:bg-gray-50"
+                >
+                  Close Form
+                </button>
+                <button
+                  type="button"
+                  onClick={createSchedule}
+                  className="rounded-2xl bg-blue-600 px-5 py-2.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700"
+                >
+                  Save Schedule
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-5 md:p-6 lg:p-7">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+              <div className="rounded-3xl border border-gray-100 bg-gray-50/60 p-4 md:p-5">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Schedule ID</label>
+                    <input
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      placeholder="ARS005"
+                      value={newSchedule.id}
+                      onChange={(e) => updateNewSchedule('id', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2 xl:col-span-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Batch Name</label>
+                    <input
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      placeholder="Batch Name"
+                      value={newSchedule.batch}
+                      onChange={(e) => updateNewSchedule('batch', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sport</label>
+                    <select
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      value={newSchedule.sport}
+                      onChange={(e) => updateNewSchedule('sport', e.target.value)}
+                    >
+                      <option>Cricket</option>
+                      <option>Football</option>
+                      <option>Fitness</option>
+                      <option>Badminton</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Coach</label>
+                    <input
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      placeholder="Coach Name"
+                      value={newSchedule.coach}
+                      onChange={(e) => updateNewSchedule('coach', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Training Days</label>
+                    <select
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      value={newSchedule.days}
+                      onChange={(e) => updateNewSchedule('days', e.target.value)}
+                    >
+                      <option>Mon Wed Fri</option>
+                      <option>Tue Thu Sat</option>
+                      <option>Mon Tue Thu</option>
+                      <option>Sat Sun</option>
+                      <option>Daily</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Start Time</label>
+                      <select
+                        className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                        value={newSchedule.startTime}
+                        onChange={(e) => updateNewSchedule('startTime', e.target.value)}
+                      >
+                        <option>05:00</option>
+                        <option>06:00</option>
+                        <option>07:00</option>
+                        <option>08:00</option>
+                        <option>16:00</option>
+                        <option>17:00</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">End Time</label>
+                      <select
+                        className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                        value={newSchedule.endTime}
+                        onChange={(e) => updateNewSchedule('endTime', e.target.value)}
+                      >
+                        <option>06:30</option>
+                        <option>07:30</option>
+                        <option>08:00</option>
+                        <option>09:00</option>
+                        <option>18:00</option>
+                        <option>19:00</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ground</label>
+                    <input
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      placeholder="Ground / Court"
+                      value={newSchedule.ground}
+                      onChange={(e) => updateNewSchedule('ground', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</label>
+                    <select
+                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      value={newSchedule.status}
+                      onChange={(e) => updateNewSchedule('status', e.target.value)}
+                    >
+                      <option>Active</option>
+                      <option>Upcoming</option>
+                      <option>Completed</option>
+                      <option>Cancelled</option>
+                      <option>Postponed</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4 rounded-3xl border border-gray-100 bg-white p-4 md:p-5">
+                <div className="rounded-2xl bg-linear-to-br from-blue-600 to-indigo-600 p-4 text-white shadow-lg shadow-blue-200">
+                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-100">Live Preview</p>
+                  <h4 className="mt-2 text-xl font-black">Landscape layout summary</h4>
+                  <p className="mt-2 text-sm text-blue-50">All form fields remain editable and the schedule is created in-page without opening a popup.</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">ID</p>
+                    <p className="mt-1 text-lg font-black text-gray-900">{newSchedule.id || 'ARS---'}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sport</p>
+                    <p className="mt-1 text-lg font-black text-gray-900">{newSchedule.sport}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4 col-span-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Batch</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900 wrap-break-word">{newSchedule.batch || 'Batch Name'}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Coach</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900 wrap-break-word">{newSchedule.coach || 'Coach Name'}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Days</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900">{newSchedule.days}</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 p-4 col-span-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Time</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900">{newSchedule.startTime} - {newSchedule.endTime}</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/60 p-4 text-sm text-gray-500">
+                  Use Save Schedule to add this entry to the live schedule list below.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!isCreateFormOpen && (
+        <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -307,120 +538,9 @@ const TrainingSchedule = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 p-4 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-3xl rounded-4xl bg-white shadow-2xl my-6">
-            <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Create Training Schedule</h3>
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Schedule setup</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsCreateModalOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-50"
-              >
-                Close
-              </button>
-            </div>
-            <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Schedule ID</label>
-                <input
-                  className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium"
-                  placeholder="ARS001"
-                />
-                <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300">Use ARS prefix (e.g. ARS001)</p>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Batch Name</label>
-                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium" placeholder="Batch Name" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sport</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
-                  <option>Select Sport</option>
-                  <option>Cricket</option>
-                  <option>Football</option>
-                  <option>Fitness</option>
-                  <option>Badminton</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Coach</label>
-                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium" placeholder="Coach Name" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Training Days</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
-                  <option>Select Days</option>
-                  <option>Mon Wed Fri</option>
-                  <option>Tue Thu Sat</option>
-                  <option>Mon Tue Thu</option>
-                  <option>Sat Sun</option>
-                  <option>Daily</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Start Time</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
-                  <option>Select Start</option>
-                  <option>05:00</option>
-                  <option>06:00</option>
-                  <option>07:00</option>
-                  <option>08:00</option>
-                  <option>16:00</option>
-                  <option>17:00</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">End Time</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
-                  <option>Select End</option>
-                  <option>06:30</option>
-                  <option>07:30</option>
-                  <option>08:00</option>
-                  <option>09:00</option>
-                  <option>18:00</option>
-                  <option>19:00</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Ground</label>
-                <input className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium" placeholder="Ground / Court" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-sm font-medium">
-                  <option>Active</option>
-                  <option>Upcoming</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
-                  <option>Postponed</option>
-                </select>
-              </div>
-            </div>
-            <div className="px-6 py-5 border-t border-gray-100 flex flex-col sm:flex-row gap-3 sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setIsCreateModalOpen(false)}
-                className="px-6 py-3 rounded-xl border border-gray-100 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsCreateModalOpen(false)}
-                className="px-6 py-3 rounded-xl bg-blue-600 text-white text-xs font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-200"
-              >
-                Create Schedule
-              </button>
-            </div>
-          </div>
         </div>
       )}
+
     </div>
   );
 };
