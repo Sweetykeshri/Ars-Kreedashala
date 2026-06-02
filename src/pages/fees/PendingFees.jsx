@@ -1,184 +1,392 @@
-import React from 'react';
-import { 
-  AlertTriangle, 
-  Bell, 
-  ChevronRight, 
-  ArrowUpRight, 
-  Search, 
+import React, { useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  Bell,
+  ChevronRight,
+  ArrowUpRight,
+  Search,
   Filter,
   DollarSign,
   Calendar,
   Clock,
-  Send
-} from 'lucide-react';
+  Send,
+  Download,
+  X,
+} from "lucide-react";
+
+const initialData = [
+  { id: "STU005", name: "Kabir Singh", batch: "Football Junior", amount: 2200, months: ["April", "May"], dueDate: "2024-04-05", risk: "High" },
+  { id: "STU003", name: "Ishaan Gupta", batch: "Cricket Beginners", amount: 2500, months: ["May"], dueDate: "2024-05-05", risk: "Medium" },
+  { id: "STU012", name: "Neha Reddy", batch: "Badminton Morning", amount: 3000, months: ["May"], dueDate: "2024-05-05", risk: "Medium" },
+  { id: "STU025", name: "Vikram Choudhary", batch: "Cricket Beginners", amount: 7500, months: ["March", "April", "May"], dueDate: "2024-03-05", risk: "Critical" },
+];
 
 const PendingFees = () => {
-  const pendingData = [
-    { id: 'STU005', name: 'Kabir Singh', batch: 'Football Junior', amount: 2200, months: ['April', 'May'], dueDate: '2024-04-05', risk: 'High' },
-    { id: 'STU003', name: 'Ishaan Gupta', batch: 'Cricket Beginners', amount: 2500, months: ['May'], dueDate: '2024-05-05', risk: 'Medium' },
-    { id: 'STU012', name: 'Neha Reddy', batch: 'Badminton Morning', amount: 3000, months: ['May'], dueDate: '2024-05-05', risk: 'Medium' },
-    { id: 'STU025', name: 'Vikram Choudhary', batch: 'Cricket Beginners', amount: 7500, months: ['March', 'April', 'May'], dueDate: '2024-03-05', risk: 'Critical' },
-  ];
+  const [data, setData] = useState(initialData);
+  const [search, setSearch] = useState("");
+  const [riskFilter, setRiskFilter] = useState("All");
+  const [batchFilter, setBatchFilter] = useState("All");
+  const [showFilter, setShowFilter] = useState(false);
+  const [msg, setMsg] = useState("");
 
-  const getRiskStyle = (risk) => {
-    switch (risk) {
-      case 'Critical': return 'bg-red-600 text-white';
-      case 'High': return 'bg-red-100 text-red-700 border-red-200';
-      case 'Medium': return 'bg-amber-100 text-amber-700 border-amber-200';
-      default: return 'bg-gray-100 text-gray-700';
-    }
+  const showMsg = (text) => {
+    setMsg(text);
+    setTimeout(() => setMsg(""), 2500);
   };
 
+  const filteredData = useMemo(() => {
+    const q = search.toLowerCase();
+
+    return data.filter((item) => {
+      const matchSearch =
+        item.name.toLowerCase().includes(q) ||
+        item.id.toLowerCase().includes(q) ||
+        item.batch.toLowerCase().includes(q);
+
+      const matchRisk = riskFilter === "All" || item.risk === riskFilter;
+      const matchBatch = batchFilter === "All" || item.batch === batchFilter;
+
+      return matchSearch && matchRisk && matchBatch;
+    });
+  }, [data, search, riskFilter, batchFilter]);
+
+  const batches = ["All", ...new Set(data.map((item) => item.batch))];
+
+  const totalDue = filteredData.reduce((sum, item) => sum + item.amount, 0);
+  const criticalCount = filteredData.filter((item) => item.risk === "Critical").length;
+
+  const sendReminder = (id) => {
+    const student = data.find((item) => item.id === id);
+    showMsg(`Reminder sent to ${student.name}`);
+  };
+
+  const sendBulkReminders = () => {
+    if (!filteredData.length) return showMsg("No pending fees found.");
+    showMsg(`Bulk reminders sent to ${filteredData.length} students.`);
+  };
+
+  const exportCSV = () => {
+    const rows = [
+      ["ID", "Name", "Batch", "Amount", "Months", "Due Date", "Risk"],
+      ...filteredData.map((i) => [
+        i.id,
+        i.name,
+        i.batch,
+        i.amount,
+        i.months.join(" "),
+        i.dueDate,
+        i.risk,
+      ]),
+    ];
+
+    const csv = rows.map((r) => r.join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pending-fees-report.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const markPaid = (id) => {
+    if (!window.confirm("Mark this fee as paid?")) return;
+    setData((prev) => prev.filter((item) => item.id !== id));
+    showMsg("Fee marked as paid successfully.");
+  };
+
+  const getRiskStyle = (risk) => {
+    if (risk === "Critical") return "bg-red-600 text-white";
+    if (risk === "High") return "bg-red-100 text-red-700";
+    if (risk === "Medium") return "bg-amber-100 text-amber-700";
+    return "bg-gray-100 text-gray-700";
+  };
+
+  const batchSummary = batches
+    .filter((b) => b !== "All")
+    .map((batch) => {
+      const items = data.filter((i) => i.batch === batch);
+      return {
+        name: batch,
+        count: items.length,
+        amount: items.reduce((s, i) => s + i.amount, 0),
+      };
+    });
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Pending Dues & Recovery</h1>
-          <p className="text-gray-500">Identify overdue accounts and initiate recovery notifications.</p>
+          <p className="text-gray-500">Track overdue fees and send reminders.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-100">
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <button
+            type="button"
+            onClick={sendBulkReminders}
+            className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-bold text-white hover:bg-red-700"
+          >
             <Bell size={18} />
-            <span>Send Bulk Reminders</span>
+            Send Bulk Reminders
+          </button>
+
+          <button
+            type="button"
+            onClick={exportCSV}
+            className="flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white hover:bg-black"
+          >
+            <Download size={18} />
+            Export
           </button>
         </div>
       </div>
 
-      {/* Financial Health Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Outstanding', value: '₹14,50,000', trend: '+15%', icon: <DollarSign size={20} className="text-red-500" />, color: 'red' },
-          { label: 'Overdue Payments', value: '184', trend: '+8', icon: <AlertTriangle size={20} className="text-amber-500" />, color: 'amber' },
-          { label: 'Recovery Rate', value: '78.5%', trend: '+4.2%', icon: <ArrowUpRight size={20} className="text-green-500" />, color: 'green' },
-          { label: 'Average Delay', value: '12 Days', trend: '-2', icon: <Clock size={20} className="text-blue-500" />, color: 'blue' },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-red-200 transition-all">
-            <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-${stat.color}-50 rounded-full opacity-50 group-hover:scale-110 transition-transform`}></div>
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-gray-50 rounded-xl group-hover:bg-white transition-colors">
-                  {stat.icon}
-                </div>
-                <span className={`text-[10px] font-black leading-none ${stat.trend.startsWith('+') ? 'text-red-500' : 'text-green-500'}`}>
-                  {stat.trend}
-                </span>
-              </div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-              <p className="text-2xl font-black text-gray-800 tracking-tight">{stat.value}</p>
-            </div>
-          </div>
-        ))}
+      {msg && (
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+          {msg}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Card icon={<DollarSign size={20} />} label="Total Outstanding" value={`₹${totalDue.toLocaleString()}`} />
+        <Card icon={<AlertTriangle size={20} />} label="Pending Accounts" value={filteredData.length} />
+        <Card icon={<Clock size={20} />} label="Critical Risk" value={criticalCount} />
+        <Card icon={<ArrowUpRight size={20} />} label="Recovery Rate" value="78.5%" />
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-5 lg:col-span-2">
+          <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <div className="flex flex-col gap-3 border-b border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
               <h3 className="font-bold text-gray-800">Critical Overdue List</h3>
-              <div className="flex gap-2">
+
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                  <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-red-500" />
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search student..."
+                    className="w-full rounded-lg border border-gray-100 bg-gray-50 py-2 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-red-500 sm:w-56"
+                  />
                 </div>
-                <button className="p-1.5 border border-gray-100 rounded-lg hover:bg-gray-50"><Filter size={16} /></button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowFilter(true)}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-gray-100 bg-white px-4 py-2 text-sm font-bold text-gray-600 hover:bg-gray-50"
+                >
+                  <Filter size={16} />
+                  Filter
+                </button>
               </div>
             </div>
+
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              <table className="min-w-[780px] w-full text-left">
+                <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400">
                   <tr>
-                    <th className="px-6 py-4">Student</th>
-                    <th className="px-6 py-4">Total Due</th>
-                    <th className="px-6 py-4">Months</th>
-                    <th className="px-6 py-4">Due Since</th>
-                    <th className="px-6 py-4">Risk</th>
-                    <th className="px-6 py-4">Action</th>
+                    <th className="px-5 py-4">Student</th>
+                    <th className="px-5 py-4">Due</th>
+                    <th className="px-5 py-4">Months</th>
+                    <th className="px-5 py-4">Due Since</th>
+                    <th className="px-5 py-4">Risk</th>
+                    <th className="px-5 py-4">Action</th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-50 text-sm">
-                  {pendingData.map((data) => (
-                    <tr key={data.id} className="hover:bg-red-50/20 transition-colors group">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-[10px] ${data.risk === 'Critical' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                            {data.id.slice(-3)}
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-800 leading-none mb-1">{data.name}</p>
-                            <p className="text-[10px] text-gray-400 uppercase font-medium">{data.batch}</p>
-                          </div>
-                        </div>
+                  {filteredData.map((item) => (
+                    <tr key={item.id} className="hover:bg-red-50/20">
+                      <td className="px-5 py-4">
+                        <p className="font-bold text-gray-800">{item.name}</p>
+                        <p className="text-xs text-gray-400">{item.id} • {item.batch}</p>
                       </td>
-                      <td className="px-6 py-4 font-black text-gray-800 tracking-tight">₹{data.amount.toLocaleString()}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-1">
-                          {data.months.map(m => (
-                            <span key={m} className="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[10px] font-bold">{m}</span>
+
+                      <td className="px-5 py-4 font-black text-gray-800">
+                        ₹{item.amount.toLocaleString()}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {item.months.map((m) => (
+                            <span key={m} className="rounded bg-gray-100 px-2 py-1 text-[10px] font-bold text-gray-500">
+                              {m}
+                            </span>
                           ))}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-xs font-semibold text-gray-500 italic">{data.dueDate}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter border border-transparent ${getRiskStyle(data.risk)}`}>
-                          {data.risk}
+
+                      <td className="px-5 py-4 text-xs font-semibold text-gray-500">
+                        {item.dueDate}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <span className={`rounded px-2 py-1 text-[10px] font-black uppercase ${getRiskStyle(item.risk)}`}>
+                          {item.risk}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Send Reminder">
-                          <Send size={16} />
-                        </button>
+
+                      <td className="px-5 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => sendReminder(item.id)}
+                            className="rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100"
+                            title="Send Reminder"
+                          >
+                            <Send size={15} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => markPaid(item.id)}
+                            className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                          >
+                            Paid
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
+
+                  {!filteredData.length && (
+                    <tr>
+                      <td colSpan="6" className="px-5 py-8 text-center text-sm font-bold text-gray-400">
+                        No pending fees found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        {/* Sidebar: Quick Actions & Alerts */}
-        <div className="space-y-6 text-sm">
-          <div className="bg-red-600 rounded-3xl p-6 text-white shadow-xl shadow-red-100 relative overflow-hidden">
-            <h3 className="font-black text-lg mb-2 relative z-10">Attention Required</h3>
-            <p className="text-red-100 text-xs mb-6 relative z-10">There are 12 payments overdue by more than 60 days. Immediate action is recommended.</p>
-            <button className="w-full py-3 bg-white text-red-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-50 transition-all relative z-10 shadow-lg active:scale-95">
+        <div className="space-y-5">
+          <div className="relative overflow-hidden rounded-3xl bg-red-600 p-6 text-white shadow">
+            <h3 className="text-lg font-black">Attention Required</h3>
+            <p className="mt-2 text-xs text-red-100">
+              Review high-risk overdue accounts immediately.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setRiskFilter("Critical");
+                setBatchFilter("All");
+                showMsg("Showing critical risk accounts.");
+              }}
+              className="mt-5 w-full rounded-2xl bg-white py-3 text-xs font-black uppercase text-red-600 hover:bg-red-50"
+            >
               Review High-Risk Accounts
             </button>
-            <AlertTriangle className="absolute -bottom-6 -right-6 text-white/10" size={120} />
+
+            <AlertTriangle className="absolute -bottom-6 -right-6 text-white/10" size={110} />
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-            <h3 className="font-bold text-gray-800 mb-4 flex items-center justify-between">
+          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <h3 className="mb-4 flex items-center justify-between font-bold text-gray-800">
               Batch-wise Due
               <Calendar size={16} className="text-gray-400" />
             </h3>
-            <div className="space-y-4">
-              {[
-                { name: 'Cricket Beginners', amount: '₹45,000', count: 18, color: 'blue' },
-                { name: 'Football Junior', amount: '₹32,500', count: 14, color: 'green' },
-                { name: 'Badminton Morning', amount: '₹12,000', count: 4, color: 'purple' },
-              ].map((batch, i) => (
-                <div key={i} className="flex items-center justify-between group cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-8 bg-${batch.color}-500 rounded-full group-hover:w-3 transition-all`}></div>
-                    <div>
-                      <p className="font-bold text-gray-700 leading-none mb-1">{batch.name}</p>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">{batch.count} Active Cases</p>
-                    </div>
+
+            <div className="space-y-3">
+              {batchSummary.map((batch) => (
+                <button
+                  key={batch.name}
+                  type="button"
+                  onClick={() => setBatchFilter(batch.name)}
+                  className="flex w-full items-center justify-between rounded-xl p-3 text-left hover:bg-gray-50"
+                >
+                  <div>
+                    <p className="font-bold text-gray-700">{batch.name}</p>
+                    <p className="text-xs font-bold text-gray-400">{batch.count} cases</p>
                   </div>
+
                   <div className="text-right">
-                    <p className="font-black text-gray-800">{batch.amount}</p>
-                    <ChevronRight size={14} className="text-gray-300 ml-auto" />
+                    <p className="font-black text-gray-800">₹{batch.amount.toLocaleString()}</p>
+                    <ChevronRight size={14} className="ml-auto text-gray-300" />
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {showFilter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-black text-gray-900">Filter Pending Fees</h3>
+              <button type="button" onClick={() => setShowFilter(false)} className="rounded-lg p-2 hover:bg-gray-100">
+                <X size={18} />
+              </button>
+            </div>
+
+            <label className="mb-3 block">
+              <span className="text-xs font-bold text-gray-500">Risk</span>
+              <select
+                value={riskFilter}
+                onChange={(e) => setRiskFilter(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-gray-200 p-3 outline-none focus:ring-2 focus:ring-red-500"
+              >
+                {["All", "Critical", "High", "Medium"].map((r) => (
+                  <option key={r}>{r}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-bold text-gray-500">Batch</span>
+              <select
+                value={batchFilter}
+                onChange={(e) => setBatchFilter(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-gray-200 p-3 outline-none focus:ring-2 focus:ring-red-500"
+              >
+                {batches.map((b) => (
+                  <option key={b}>{b}</option>
+                ))}
+              </select>
+            </label>
+
+            <div className="mt-5 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setRiskFilter("All");
+                  setBatchFilter("All");
+                  setShowFilter(false);
+                }}
+                className="w-full rounded-xl bg-gray-100 py-3 text-xs font-black uppercase text-gray-700"
+              >
+                Reset
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowFilter(false)}
+                className="w-full rounded-xl bg-red-600 py-3 text-xs font-black uppercase text-white"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const Card = ({ icon, label, value }) => (
+  <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="mb-4 rounded-xl bg-gray-50 p-2 text-red-500 w-fit">{icon}</div>
+    <p className="text-xs font-bold uppercase tracking-widest text-gray-400">{label}</p>
+    <p className="mt-1 text-2xl font-black text-gray-800">{value}</p>
+  </div>
+);
 
 export default PendingFees;

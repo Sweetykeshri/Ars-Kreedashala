@@ -16,6 +16,7 @@ const qualificationOptions = ['Diploma', 'B.P.Ed', 'M.P.Ed', 'NIS', 'Other'];
 const availabilityOptions = ['Available', 'Limited', 'Busy', 'On Leave'];
 const employmentTypes = ['Permanent', 'Contract', 'Visiting', 'Seasonal'];
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+const COACH_REGISTRY_KEY = 'ars_coach_registrations';
 
 const CoachRegistration = () => {
   const [currentStep, setCurrentStep] = useState(2);
@@ -121,6 +122,35 @@ const CoachRegistration = () => {
 
   const goToNextStep = () => {
     setCurrentStep((previous) => Math.min(4, previous + 1));
+  };
+
+  const handleRegisterCoach = () => {
+    const coachName = formData.coachName.trim();
+    const coachId = formData.coachId.trim();
+
+    if (!coachName) {
+      alert('Please enter the coach name before submitting.');
+      return;
+    }
+
+    const existingRegistrations = JSON.parse(localStorage.getItem(COACH_REGISTRY_KEY) || '[]');
+    const nextCoachId = coachId || `ARS-COACH-${String(existingRegistrations.length + 1).padStart(3, '0')}`;
+
+    const newCoach = {
+      id: nextCoachId,
+      name: coachName,
+      sport: formData.specialization || 'Unassigned',
+      batch: formData.assignedBatch || 'Pending Allocation',
+      branch: formData.branchLocation || 'Main Branch',
+      sessions: formData.workingDays ? formData.workingDays.split(',').filter(Boolean).length || 1 : 1,
+      status: formData.coachStatus || 'Active',
+      registeredAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(COACH_REGISTRY_KEY, JSON.stringify([...existingRegistrations, newCoach]));
+    window.dispatchEvent(new Event('ars:coach-registrations-updated'));
+
+    alert(`Coach ${coachName} registered successfully.`);
   };
 
   const SectionHeader = ({ title }) => (
@@ -615,7 +645,11 @@ const CoachRegistration = () => {
         <button type="button" onClick={goToPreviousStep} disabled={currentStep === 1} className="rounded-2xl border border-gray-100 px-6 py-3 text-[11px] font-bold uppercase tracking-widest text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-w-36">
           Previous
         </button>
-        <button type="button" onClick={goToNextStep} className="rounded-2xl bg-[#8B8B00] px-6 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-[#8B8B00]/20 transition hover:bg-[#7c7c00] sm:min-w-36">
+        <button
+          type="button"
+          onClick={currentStep === 4 ? handleRegisterCoach : goToNextStep}
+          className="rounded-2xl bg-[#8B8B00] px-6 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-[#8B8B00]/20 transition hover:bg-[#7c7c00] sm:min-w-36"
+        >
           {currentStep === 4 ? 'Register Coach' : 'Next'}
         </button>
       </div>

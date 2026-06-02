@@ -26,6 +26,7 @@ import CoachProfiles from './pages/coach/CoachProfiles';
 import CoachDetails from './pages/coach/CoachDetails';
 import AssignedBatches from './pages/coach/AssignedBatches';
 import CoachRegistration from './pages/coach/CoachRegistration';
+import CoachFee from './pages/coach/CoachFee';
 
 // Reports & Analytics
 import AdmissionReports from './pages/reports/AdmissionReports';
@@ -76,6 +77,7 @@ function App() {
             <Route path="profiles" element={<CoachProfiles />} />
             <Route path="profiles/:coachId" element={<CoachDetails />} />
             <Route path="registration" element={<CoachRegistration />} />
+            <Route path="fees" element={<CoachFee />} />
             <Route path="attendance" element={<Navigate to="/attendance/coaches" replace />} />
             <Route path="assigned-batches" element={<AssignedBatches />} />
           </Route>
