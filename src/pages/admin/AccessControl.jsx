@@ -1,185 +1,312 @@
-import React, { useState } from 'react';
-import { 
-  Lock, 
-  ShieldCheck, 
-  Key, 
-  Save, 
+import React, { useMemo, useState } from "react";
+import {
+  Lock,
+  ShieldCheck,
+  Key,
+  Save,
   AlertTriangle,
-  Users,
   Eye,
   Edit3,
   Trash,
   CheckCircle2,
   Settings,
-  ShieldHalf
-} from 'lucide-react';
-import { AdminHeader, AdminStatCard, AdminToggle } from '../../components/admin/AdminShared';
+  ShieldHalf,
+  RotateCcw,
+  CheckSquare,
+  XSquare,
+} from "lucide-react";
+
+const roles = ["SUPERUSER", "OPERATIONS", "FINANCE", "COACH"];
+
+const baseModules = [
+  { id: "ADM", name: "Admissions Panel" },
+  { id: "TRA", name: "Training Operations" },
+  { id: "FEE", name: "Treasury & Finance" },
+  { id: "ATT", name: "Presence Hub" },
+  { id: "STA", name: "Staffing HQ" },
+];
+
+const makePermissions = (role) =>
+  baseModules.map((m) => ({
+    ...m,
+    view: true,
+    create: role === "SUPERUSER" || role === "OPERATIONS",
+    edit: role === "SUPERUSER" || role === "OPERATIONS",
+    delete: role === "SUPERUSER",
+    approve: role === "SUPERUSER" || (role === "OPERATIONS" && m.id !== "FEE"),
+  }));
+
+const defaultMatrix = Object.fromEntries(
+  roles.map((role) => [role, makePermissions(role)])
+);
+
+const storageKey = "ars_access_control_matrix";
 
 const AccessControl = () => {
-  const [selectedRole, setSelectedRole] = useState('OPERATIONS');
-  const [permissionState, setPermissionState] = useState([
-    { id: 'ADM', name: 'Admissions Panel', view: true, create: true, edit: true, delete: false, approve: true },
-    { id: 'TRA', name: 'Training Operations', view: true, create: true, edit: true, delete: true, approve: true },
-    { id: 'FEE', name: 'Treasury & Finance', view: true, create: false, edit: false, delete: false, approve: false },
-    { id: 'ATT', name: 'Presence Hub', view: true, create: true, edit: true, delete: false, approve: false },
-    { id: 'STA', name: 'Staffing HQ', view: true, create: false, edit: false, delete: false, approve: false },
-  ]);
+  const [selectedRole, setSelectedRole] = useState("OPERATIONS");
+  const [matrix, setMatrix] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || defaultMatrix;
+    } catch {
+      return defaultMatrix;
+    }
+  });
+  const [message, setMessage] = useState("");
 
-  const togglePermission = (id, field) => {
-    setPermissionState(prev => prev.map(p => 
-      p.id === id ? { ...p, [field]: !p[field] } : p
-    ));
+  const permissions = matrix[selectedRole] || [];
+
+  const stats = useMemo(() => {
+    const totalEnabled = permissions.reduce(
+      (sum, item) =>
+        sum +
+        ["view", "create", "edit", "delete", "approve"].filter((p) => item[p])
+          .length,
+      0
+    );
+
+    return [
+      { label: "Access Levels", value: roles.length, icon: Key },
+      { label: "Enabled Rights", value: totalEnabled, icon: ShieldCheck },
+      {
+        label: "Delete Access",
+        value: permissions.filter((p) => p.delete).length,
+        icon: ShieldHalf,
+      },
+      { label: "Current Tier", value: selectedRole, icon: Settings },
+    ];
+  }, [permissions, selectedRole]);
+
+  const updateRolePermissions = (nextPermissions) => {
+    setMatrix((prev) => ({
+      ...prev,
+      [selectedRole]: nextPermissions,
+    }));
+  };
+
+  const togglePermission = (moduleId, field) => {
+    updateRolePermissions(
+      permissions.map((item) =>
+        item.id === moduleId ? { ...item, [field]: !item[field] } : item
+      )
+    );
+  };
+
+  const setAllPermissions = (value) => {
+    updateRolePermissions(
+      permissions.map((item) => ({
+        ...item,
+        view: value,
+        create: value,
+        edit: value,
+        delete: value,
+        approve: value,
+      }))
+    );
+  };
+
+  const resetRole = () => {
+    updateRolePermissions(makePermissions(selectedRole));
+    setMessage(`${selectedRole} permissions reset to default.`);
+  };
+
+  const deployProtocols = () => {
+    localStorage.setItem(storageKey, JSON.stringify(matrix));
+    setMessage(`${selectedRole} security protocols deployed successfully.`);
   };
 
   return (
-    <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <AdminHeader 
-        title="Security Protocols" 
-        subtitle="Manage cryptographic access levels and module clearance hierarchies"
-        icon={Lock}
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <AdminStatCard 
-          label="Access Levels" 
-          value="08" 
-          subvalue="Defined Tiers" 
-          icon={Key} 
-          color="blue"
-        />
-        <AdminStatCard 
-          label="Module Integrity" 
-          value="100%" 
-          subvalue="Secure Operations" 
-          icon={ShieldCheck} 
-          color="emerald"
-        />
-        <AdminStatCard 
-          label="Active Overrides" 
-          value="02" 
-          subvalue="Temporary Shields" 
-          icon={ShieldHalf} 
-          color="amber"
-          trend="Alert"
-        />
-        <AdminStatCard 
-          label="Security Pulse" 
-          value="Normal" 
-          subvalue="Last Scan: 2m ago" 
-          icon={Settings} 
-          color="indigo"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Tier Selector */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm">
-             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Execution Tiers</h3>
-             <div className="space-y-2">
-                {['SUPERUSER', 'OPERATIONS', 'FINANCE', 'COACH'].map((role) => (
-                  <button
-                    key={role}
-                    onClick={() => setSelectedRole(role)}
-                    className={`w-full text-left px-5 py-5 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all border ${
-                      selectedRole === role 
-                        ? 'bg-blue-600 text-white border-transparent shadow-xl shadow-blue-100 ring-2 ring-blue-500 ring-offset-2' 
-                        : 'bg-white text-gray-400 border-gray-50 hover:bg-gray-50 hover:text-gray-600'
-                    }`}
-                  >
-                    {role} Profile
-                  </button>
-                ))}
-             </div>
+    <div className="w-full max-w-full space-y-6 overflow-hidden p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white">
+            <Lock size={24} />
           </div>
-          
-          <div className="bg-emerald-600 p-8 rounded-[2.5rem] text-white shadow-xl shadow-emerald-100 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 -mr-4 -mt-4 p-4 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
-              <CheckCircle2 size={32} />
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-100 mb-2">Protocol Status</p>
-            <h4 className="text-xl font-black uppercase leading-tight mb-4 tracking-tighter">Clearance Level: Alpha-2</h4>
-            <div className="flex items-center gap-2 text-[8px] font-black text-emerald-200 uppercase italic">
-              All systems nominal
-            </div>
+          <div>
+            <h1 className="text-xl font-black uppercase text-gray-900 sm:text-2xl">
+              Security Protocols
+            </h1>
+            <p className="mt-1 text-sm font-medium text-gray-500">
+              Manage access levels and module permissions.
+            </p>
           </div>
         </div>
 
-        {/* Matrix */}
-        <div className="lg:col-span-3 space-y-6">
-           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-               <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                  <div>
-                    <h3 className="text-sm font-black text-gray-900 uppercase">Module Clearance Matrix</h3>
-                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1 italic">Configuring clearance for {selectedRole} Tier</p>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      if(confirm(`System Authorization: Confirm deployment of new security protocols for ${selectedRole} Tier? This will take immediate effect.`)) {
-                        alert(`Security Matrix for ${selectedRole} has been updated and synchronized.`);
-                      }
-                    }}
-                    className="flex items-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-xl font-black uppercase text-[10px] hover:bg-black shadow-xl shadow-gray-200 transition-all"
-                  >
-                    <Save size={16} /> Deploy Protocols
-                  </button>
-               </div>
-               
-               <div className="overflow-x-auto">
-                 <table className="w-full text-left">
-                   <thead>
-                     <tr className="bg-gray-50/50">
-                       <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Module</th>
-                       <th className="px-4 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest"><Eye size={14} className="mx-auto mb-1 text-blue-600" /> View</th>
-                       <th className="px-4 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest"><ShieldCheck size={14} className="mx-auto mb-1 text-indigo-600" /> Create</th>
-                       <th className="px-4 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest"><Edit3 size={14} className="mx-auto mb-1 text-emerald-600" /> Edit</th>
-                       <th className="px-4 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest"><Trash size={14} className="mx-auto mb-1 text-rose-600" /> Delete</th>
-                       <th className="px-4 py-6 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest"><CheckCircle2 size={14} className="mx-auto mb-1 text-amber-600" /> Approve</th>
-                     </tr>
-                   </thead>
-                   <tbody className="divide-y divide-gray-50">
-                     {permissionState.map((module) => (
-                       <tr key={module.id} className="hover:bg-gray-50/50 transition-colors">
-                         <td className="px-10 py-6">
-                           <span className="text-[10px] font-black text-gray-900 uppercase tracking-wider">{module.name}</span>
-                         </td>
-                         <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.view} onChange={() => togglePermission(module.id, 'view')} /></div>
-                         </td>
-                         <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.create} onChange={() => togglePermission(module.id, 'create')} /></div>
-                         </td>
-                         <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.edit} onChange={() => togglePermission(module.id, 'edit')} /></div>
-                         </td>
-                         <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.delete} onChange={() => togglePermission(module.id, 'delete')} /></div>
-                         </td>
-                         <td className="px-4 py-6 text-center">
-                           <div className="flex justify-center"><AdminToggle enabled={module.approve} onChange={() => togglePermission(module.id, 'approve')} /></div>
-                         </td>
-                       </tr>
-                     ))}
-                   </tbody>
-                 </table>
-               </div>
-           </div>
+        <button
+          onClick={deployProtocols}
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gray-900 px-5 text-xs font-black uppercase tracking-widest text-white hover:bg-black sm:w-auto"
+        >
+          <Save size={16} />
+          Deploy Protocols
+        </button>
+      </div>
 
-           <div className="bg-rose-50 p-8 rounded-[2rem] border border-rose-100 flex items-start gap-5">
-              <div className="shrink-0 p-3 bg-white rounded-2xl text-rose-600 shadow-sm border border-rose-100">
-                 <AlertTriangle size={24} />
+      {message && (
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-xs font-black uppercase tracking-widest text-emerald-700">
+          {message}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map(({ label, value, icon: Icon }) => (
+          <div key={label} className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="rounded-2xl bg-blue-50 p-3 text-blue-600">
+                <Icon size={20} />
               </div>
+              <span className="rounded-full bg-gray-50 px-2 py-1 text-[10px] font-black uppercase text-gray-500">
+                Live
+              </span>
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              {label}
+            </p>
+            <h3 className="mt-1 text-2xl font-black text-gray-900">{value}</h3>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
+        <div className="space-y-4 xl:col-span-1">
+          <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
+            <h3 className="mb-5 text-[10px] font-black uppercase tracking-widest text-gray-400">
+              Execution Tiers
+            </h3>
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1">
+              {roles.map((role) => (
+                <button
+                  key={role}
+                  onClick={() => setSelectedRole(role)}
+                  className={`rounded-2xl border px-5 py-4 text-left text-[10px] font-black uppercase tracking-wider transition-all ${
+                    selectedRole === role
+                      ? "border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-100"
+                      : "border-gray-100 bg-white text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {role} Profile
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] bg-emerald-600 p-6 text-white shadow-lg shadow-emerald-100">
+            <CheckCircle2 size={30} />
+            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-emerald-100">
+              Protocol Status
+            </p>
+            <h4 className="mt-1 text-lg font-black uppercase">
+              Clearance Level: Alpha-2
+            </h4>
+          </div>
+        </div>
+
+        <div className="space-y-5 xl:col-span-3">
+          <div className="overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 border-b border-gray-100 bg-gray-50/40 p-4 lg:flex-row lg:items-center lg:justify-between lg:p-6">
               <div>
-                 <h4 className="text-[10px] font-black text-rose-800 uppercase tracking-widest mb-1">Administrative Warning</h4>
-                 <p className="text-[10px] font-bold text-rose-600 leading-relaxed uppercase italic opacity-80">
-                   System-wide clearance modifications require Level-3 encryption keys. All changes are being recorded in the Tactical Nexus Activity Logs.
-                 </p>
+                <h3 className="text-sm font-black uppercase text-gray-900">
+                  Module Clearance Matrix
+                </h3>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  Configuring {selectedRole} tier
+                </p>
               </div>
-           </div>
+
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <button
+                  onClick={() => setAllPermissions(true)}
+                  className="flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-[10px] font-black uppercase text-white hover:bg-blue-700"
+                >
+                  <CheckSquare size={14} />
+                  Grant All
+                </button>
+
+                <button
+                  onClick={() => setAllPermissions(false)}
+                  className="flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-[10px] font-black uppercase text-gray-700 hover:bg-gray-50"
+                >
+                  <XSquare size={14} />
+                  Revoke All
+                </button>
+
+                <button
+                  onClick={resetRole}
+                  className="flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-[10px] font-black uppercase text-gray-700 hover:bg-gray-50"
+                >
+                  <RotateCcw size={14} />
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[820px] text-left">
+                <thead>
+                  <tr className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <th className="px-5 py-5">Module</th>
+                    <th className="px-4 py-5 text-center"><Eye size={14} className="mx-auto mb-1" />View</th>
+                    <th className="px-4 py-5 text-center"><ShieldCheck size={14} className="mx-auto mb-1" />Create</th>
+                    <th className="px-4 py-5 text-center"><Edit3 size={14} className="mx-auto mb-1" />Edit</th>
+                    <th className="px-4 py-5 text-center"><Trash size={14} className="mx-auto mb-1" />Delete</th>
+                    <th className="px-4 py-5 text-center"><CheckCircle2 size={14} className="mx-auto mb-1" />Approve</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-gray-50">
+                  {permissions.map((module) => (
+                    <tr key={module.id} className="hover:bg-gray-50">
+                      <td className="px-5 py-5 text-xs font-black uppercase text-gray-900">
+                        {module.name}
+                      </td>
+
+                      {["view", "create", "edit", "delete", "approve"].map((field) => (
+                        <td key={field} className="px-4 py-5 text-center">
+                          <Toggle
+                            enabled={module[field]}
+                            onClick={() => togglePermission(module.id, field)}
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 rounded-[2rem] border border-rose-100 bg-rose-50 p-5 sm:flex-row">
+            <div className="shrink-0 rounded-2xl border border-rose-100 bg-white p-3 text-rose-600">
+              <AlertTriangle size={24} />
+            </div>
+            <div>
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-rose-800">
+                Administrative Warning
+              </h4>
+              <p className="mt-2 text-xs font-bold uppercase leading-relaxed text-rose-600/80">
+                All clearance changes are recorded in activity logs. Deploy protocols after editing permissions.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
+const Toggle = ({ enabled, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`relative h-7 w-12 rounded-full transition-all ${
+      enabled ? "bg-blue-600" : "bg-gray-200"
+    }`}
+  >
+    <span
+      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+        enabled ? "left-6" : "left-1"
+      }`}
+    />
+  </button>
+);
 
 export default AccessControl;
